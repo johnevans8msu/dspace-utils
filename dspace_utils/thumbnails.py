@@ -34,14 +34,16 @@ class ThumbnailGenerator(object):
     def __exit__(self, exc_type, exc_value, exc_traceback):
         pass
 
-    def run(self):
+    def get_item_from_handle(self):
 
         url = f'{self.api_endpoint}/pid/find'
         params = {'id': f'hdl:{self.handle}'}
         r = self.client.api_get(url, params)
         r.raise_for_status()
 
-        item = Item(r.json())
+        return Item(r.json())
+
+    def delete_thumbnail_bitstream(self, item):
 
         bundles = self.client.get_bundles(item)
         bundle = next(filter(lambda x: x.name == 'THUMBNAIL', bundles), None)
@@ -59,6 +61,8 @@ class ThumbnailGenerator(object):
         r = self.client.api_patch(url, 'remove', path, None, retry=True)
         r.raise_for_status()
 
+    def get_database_pagenumber(self):
+
         # Get the page number of the expected thumbnail
         conn = psycopg2.connect('postgres://tomcat@localhost/dspace')
         cursor = conn.cursor()
@@ -73,12 +77,10 @@ class ThumbnailGenerator(object):
         cursor.execute(sql, {'handle': self.handle})
         page_number = cursor.fetchone()[0]
 
-        # get the original document
-        orig_bundle = next(filter(lambda x: x.name == 'ORIGINAL', bundles), None)  # noqa : E501
-        o_bitstreams = self.client.get_bitstreams(bundle=orig_bundle)
-        o_bitstream = o_bitstreams[0]
+        return page_number
 
-        r = self.client.download_bitstream(o_bitstream.uuid)
+    def create_thumbnail_image(self, page_number, r):
+
         document = 'document.pdf'
         with open('document.pdf', mode='wb') as f:
             f.write(r.content)
@@ -99,13 +101,35 @@ class ThumbnailGenerator(object):
             stderr = stderr.decode('utf-8')
             raise RuntimeError(stderr)
 
+    def create_new_thumbnail(self, item):
+
+        page_number = self.get_database_pagenumber()
+
+        bundles = self.client.get_bundles(item)
+        bundle = next(filter(lambda x: x.name == 'THUMBNAIL', bundles), None)
+
+        # get the original document
+        orig_bundle = next(filter(lambda x: x.name == 'ORIGINAL', bundles), None)  # noqa : E501
+        o_bitstreams = self.client.get_bitstreams(bundle=orig_bundle)
+        o_bitstream = o_bitstreams[0]
+
+        r = self.client.download_bitstream(o_bitstream.uuid)
+
+        self.create_thumbnail_image(page_number, r)
+
         metadata = {
             'dc.title': [{"value": "THUMBNAIL", 'confidence': -1, 'place': 0}]
         }
         self.client.create_bitstream(
             bundle=bundle,
-            name=thumbnail,
-            path=thumbnail,
+            name='document.pdf.jpg',
+            path='document.pdf.jpg',
             mime='image/jpeg',
             metadata=metadata
         )
+
+    def run(self):
+
+        item = self.get_item_from_handle()
+        self.delete_thumbnail_bitstream(item)
+        self.create_new_thumbnail(item)
