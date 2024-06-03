@@ -167,7 +167,27 @@ class ThumbnailGenerator(object):
         self.create_thumbnail_image(page_number, r)
 
         metadata = {
-            'dc.title': [{"value": "THUMBNAIL", 'confidence': -1, 'place': 0}]
+            'dc.description': [{
+                "value": "IM Thumbnail",
+                'language': None,
+                'authority': None,
+                'confidence': -1,
+                'place': 0
+            }],
+            'dc.source': [{
+                "value": 'Written by ThumbnailGenerator',
+                'language': None,
+                'authority': None,
+                'confidence': -1,
+                'place': 0
+            }],
+            'dc.title': [{
+                "value": 'document.pdf.jpg',
+                'language': None,
+                'authority': None,
+                'confidence': -1,
+                'place': 0
+            }]
         }
         self.client.create_bitstream(
             bundle=bundle,
