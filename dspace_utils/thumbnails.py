@@ -30,6 +30,9 @@ class ThumbnailGenerator(object):
         self, handle, api_endpoint=None, username=None, password=None
     ):
 
+        if username is None or password is None:
+            raise RuntimeError("Username or password not provided.")
+
         self.handle = handle
 
         self.api_endpoint = api_endpoint

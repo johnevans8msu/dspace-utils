@@ -88,3 +88,24 @@ class TestSuite(unittest.TestCase):
 
         with ThumbnailGenerator(handle, **self.dspace_kwargs) as o:
             o.run()
+
+        client_patcher.stop()
+
+    def test_no_username(self):
+        """
+        Scenario:  no username is provided
+
+        Expected result:  RuntimeError
+        """
+        client_patcher = mock.patch(
+            'dspace_utils.thumbnails.DSpaceClient', autospec=True
+        )
+        client_patcher.start()
+
+        handle = '1/18274'
+
+        self.dspace_kwargs.pop('username')
+        with self.assertRaises(RuntimeError):
+            ThumbnailGenerator(handle, **self.dspace_kwargs)
+
+        client_patcher.stop()
