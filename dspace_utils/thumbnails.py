@@ -85,18 +85,18 @@ class ThumbnailGenerator(object):
             sys.exit()
 
         bitstreams = self.client.get_bitstreams(bundle=bundle)
-        try:
-            bitstream = bitstreams[0]
-        except IndexError:
-            # no bitstreams for the thumbnail, that's ok
-            return
 
-        # delete the existing thumbnail
-        # should return 204
-        url = f'{self.api_endpoint}/core/bitstreams'
-        path = f'/bitstreams/{bitstream.uuid}'
-        r = self.client.api_patch(url, 'remove', path, None, retry=True)
-        r.raise_for_status()
+        # there may be zero, one, or more than one bitstream.  But if they
+        # are associated with the THUMBNAIL bundle, we will delete it.
+
+        for bitstream in bitstreams:
+
+            # delete the existing thumbnail
+            # should return 204
+            url = f'{self.api_endpoint}/core/bitstreams'
+            path = f'/bitstreams/{bitstream.uuid}'
+            r = self.client.api_patch(url, 'remove', path, None, retry=True)
+            r.raise_for_status()
 
     def get_database_pagenumber(self):
         """
@@ -152,7 +152,7 @@ class ThumbnailGenerator(object):
         page_number = self.get_database_pagenumber()
 
         bundles = self.client.get_bundles(item)
-        bundle = next(
+        thumbnail_bundle = next(
             filter(lambda x: x.name == 'THUMBNAIL', bundles),
             None
         )
@@ -165,19 +165,22 @@ class ThumbnailGenerator(object):
         o_bitstreams = self.client.get_bitstreams(bundle=orig_bundle)
         o_bitstream = o_bitstreams[0]
 
+        docname = o_bitstream.metadata['dc.title'][0]['value']
+        thumbnail_name = f"{docname}.jpg"
+
         r = self.client.download_bitstream(o_bitstream.uuid)
 
         with tempfile.TemporaryDirectory() as tdir:
 
-            orig_doc_path = f'{tdir}/document.pdf'
-            new_thumbnail_path = f'{tdir}/document.pdf.jpg'
+            orig_doc_path = f'{tdir}/{docname}'
+            new_thumbnail_path = f'{tdir}/{thumbnail_name}'
             self.create_thumbnail_image(
                 orig_doc_path, new_thumbnail_path, page_number, r
             )
 
             metadata = {
                 'dc.description': [{
-                    "value": "IM Thumbnail",
+                    "value": "Custom Thumbnail",
                     'language': None,
                     'authority': None,
                     'confidence': -1,
@@ -191,7 +194,7 @@ class ThumbnailGenerator(object):
                     'place': 0
                 }],
                 'dc.title': [{
-                    "value": 'document.pdf.jpg',
+                    "value": thumbnail_name,
                     'language': None,
                     'authority': None,
                     'confidence': -1,
@@ -200,8 +203,8 @@ class ThumbnailGenerator(object):
             }
 
             self.client.create_bitstream(
-                bundle=bundle,
-                name='document.pdf.jpg',
+                bundle=thumbnail_bundle,
+                name=thumbnail_name,
                 path=new_thumbnail_path,
                 mime='image/jpeg',
                 metadata=metadata
