@@ -9,6 +9,22 @@ import psycopg2
 
 
 class ThumbnailGenerator(object):
+    """
+    Generate thumbnail images for dspace instance
+
+    Attributes
+    ----------
+    api_endpoint : str
+        base path to DSpace REST API, eg. http://localhost:8080/server/api
+    username : str
+        username with appropriate privileges to perform operations on REST API
+    username : str
+        password for the above username
+    handle : str
+        persistent identifier for the item in question
+    client : object
+        REST interface wrapper
+    """
 
     def __init__(
         self, handle, api_endpoint=None, username=None, password=None
@@ -35,6 +51,9 @@ class ThumbnailGenerator(object):
         pass
 
     def get_item_from_handle(self):
+        """
+        Locate the item tied to the current handle.
+        """
 
         url = f'{self.api_endpoint}/pid/find'
         params = {'id': f'hdl:{self.handle}'}
@@ -44,6 +63,9 @@ class ThumbnailGenerator(object):
         return Item(r.json())
 
     def delete_thumbnail_bitstream(self, item):
+        """
+        Delete the thumbnail bitstream associated with the current item.
+        """
 
         bundles = self.client.get_bundles(item)
         bundle = next(filter(lambda x: x.name == 'THUMBNAIL', bundles), None)
@@ -62,6 +84,9 @@ class ThumbnailGenerator(object):
         r.raise_for_status()
 
     def get_database_pagenumber(self):
+        """
+        Retrieve the thumbnail pagenumber associated with the current item.
+        """
 
         # Get the page number of the expected thumbnail
         conn = psycopg2.connect('postgres://tomcat@localhost/dspace')
@@ -80,6 +105,9 @@ class ThumbnailGenerator(object):
         return page_number
 
     def create_thumbnail_image(self, page_number, r):
+        """
+        Create a thumbnail JPEG image from the PDF document.
+        """
 
         document = 'document.pdf'
         with open('document.pdf', mode='wb') as f:
@@ -102,14 +130,23 @@ class ThumbnailGenerator(object):
             raise RuntimeError(stderr)
 
     def create_new_thumbnail(self, item):
+        """
+        Create a new thumbnail for the current image, overwriting the old.
+        """
 
         page_number = self.get_database_pagenumber()
 
         bundles = self.client.get_bundles(item)
-        bundle = next(filter(lambda x: x.name == 'THUMBNAIL', bundles), None)
+        bundle = next(
+            filter(lambda x: x.name == 'THUMBNAIL', bundles),
+            None
+        )
 
         # get the original document
-        orig_bundle = next(filter(lambda x: x.name == 'ORIGINAL', bundles), None)  # noqa : E501
+        orig_bundle = next(
+            filter(lambda x: x.name == 'ORIGINAL', bundles),
+            None
+        )
         o_bitstreams = self.client.get_bitstreams(bundle=orig_bundle)
         o_bitstream = o_bitstreams[0]
 
