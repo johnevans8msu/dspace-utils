@@ -1,4 +1,5 @@
 # standard library imports
+import os
 import subprocess
 import sys
 
@@ -29,6 +30,9 @@ class ThumbnailGenerator(object):
     def __init__(
         self, handle, api_endpoint=None, username=None, password=None
     ):
+
+        if username is None:
+            username = os.environ.get('DSPACE_API_USERNAME', None)
 
         if username is None or password is None:
             raise RuntimeError("Username or password not provided.")
