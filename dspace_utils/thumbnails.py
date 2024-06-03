@@ -85,7 +85,11 @@ class ThumbnailGenerator(object):
             sys.exit()
 
         bitstreams = self.client.get_bitstreams(bundle=bundle)
-        bitstream = bitstreams[0]
+        try:
+            bitstream = bitstreams[0]
+        except IndexError:
+            # no bitstreams for the thumbnail, that's ok
+            return
 
         # delete the existing thumbnail
         # should return 204
@@ -115,31 +119,30 @@ class ThumbnailGenerator(object):
 
         return page_number
 
-    def create_thumbnail_image(self, page_number, r):
+    def create_thumbnail_image(
+        self, orig_doc_path, new_thumbnail_path, page_number, r
+    ):
         """
         Create a thumbnail JPEG image from the PDF document.
         """
 
-        with tempfile.TemporaryDirectory() as tdir:
-            document = f'{tdir}/document.pdf'
-            with open(document, mode='wb') as f:
-                f.write(r.content)
+        with open(orig_doc_path, mode='wb') as f:
+            f.write(r.content)
 
-            # create the new thumbnail
-            thumbnail = f'{tdir}/{document}.jpg'
-            cmd = (
-                f'gm convert -thumbnail 160x160 '
-                f'-flatten {document}[{page_number}] {thumbnail}'
-            )
-            p = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE)
-            p.wait()
+        # create the new thumbnail
+        cmd = (
+            f'gm convert -thumbnail 160x160 '
+            f'-flatten {orig_doc_path}[{page_number}] {new_thumbnail_path}'
+        )
+        p = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE)
+        p.wait()
 
-            stdout, stderr = p.communicate()
-            stdout = stdout.decode('utf-8')
+        stdout, stderr = p.communicate()
+        stdout = stdout.decode('utf-8')
 
-            if p.returncode != 0:
-                stderr = stderr.decode('utf-8')
-                raise RuntimeError(stderr)
+        if p.returncode != 0:
+            stderr = stderr.decode('utf-8')
+            raise RuntimeError(stderr)
 
     def create_new_thumbnail(self, item):
         """
@@ -164,38 +167,45 @@ class ThumbnailGenerator(object):
 
         r = self.client.download_bitstream(o_bitstream.uuid)
 
-        self.create_thumbnail_image(page_number, r)
+        with tempfile.TemporaryDirectory() as tdir:
 
-        metadata = {
-            'dc.description': [{
-                "value": "IM Thumbnail",
-                'language': None,
-                'authority': None,
-                'confidence': -1,
-                'place': 0
-            }],
-            'dc.source': [{
-                "value": 'Written by ThumbnailGenerator',
-                'language': None,
-                'authority': None,
-                'confidence': -1,
-                'place': 0
-            }],
-            'dc.title': [{
-                "value": 'document.pdf.jpg',
-                'language': None,
-                'authority': None,
-                'confidence': -1,
-                'place': 0
-            }]
-        }
-        self.client.create_bitstream(
-            bundle=bundle,
-            name='document.pdf.jpg',
-            path='document.pdf.jpg',
-            mime='image/jpeg',
-            metadata=metadata
-        )
+            orig_doc_path = f'{tdir}/document.pdf'
+            new_thumbnail_path = f'{tdir}/document.pdf.jpg'
+            self.create_thumbnail_image(
+                orig_doc_path, new_thumbnail_path, page_number, r
+            )
+
+            metadata = {
+                'dc.description': [{
+                    "value": "IM Thumbnail",
+                    'language': None,
+                    'authority': None,
+                    'confidence': -1,
+                    'place': 0
+                }],
+                'dc.source': [{
+                    "value": 'Written by ThumbnailGenerator',
+                    'language': None,
+                    'authority': None,
+                    'confidence': -1,
+                    'place': 0
+                }],
+                'dc.title': [{
+                    "value": 'document.pdf.jpg',
+                    'language': None,
+                    'authority': None,
+                    'confidence': -1,
+                    'place': 0
+                }]
+            }
+
+            self.client.create_bitstream(
+                bundle=bundle,
+                name='document.pdf.jpg',
+                path=new_thumbnail_path,
+                mime='image/jpeg',
+                metadata=metadata
+            )
 
     def run(self):
 
