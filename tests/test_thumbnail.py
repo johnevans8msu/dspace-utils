@@ -109,3 +109,22 @@ class TestSuite(unittest.TestCase):
             ThumbnailGenerator(handle, **self.dspace_kwargs)
 
         client_patcher.stop()
+
+    def test_no_password(self):
+        """
+        Scenario:  no password is provided
+
+        Expected result:  RuntimeError
+        """
+        client_patcher = mock.patch(
+            'dspace_utils.thumbnails.DSpaceClient', autospec=True
+        )
+        client_patcher.start()
+
+        handle = '1/18274'
+
+        self.dspace_kwargs.pop('password')
+        with self.assertRaises(RuntimeError):
+            ThumbnailGenerator(handle, **self.dspace_kwargs)
+
+        client_patcher.stop()
