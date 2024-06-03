@@ -1,7 +1,7 @@
 # standard library imports
 from collections import namedtuple
 import unittest
-from unittest import mock
+from unittest.mock import patch
 
 # 3rd party library imports
 # from dspace_rest_client.client import DSpaceClient
@@ -11,6 +11,13 @@ from dspace_utils import ThumbnailGenerator
 from dspace_utils.thumbnails import Bundle
 
 
+@patch.dict('dspace_utils.thumbnails.os.environ', {}, clear=True)
+@patch('dspace_utils.thumbnails.subprocess', autospec=True)
+@patch('dspace_utils.thumbnails.psycopg2', autospec=True)
+@patch('dspace_utils.thumbnails.Bitstream', autospec=True)
+@patch('dspace_utils.thumbnails.Bundle', autospec=True)
+@patch('dspace_utils.thumbnails.Item', autospec=True)
+@patch('dspace_utils.thumbnails.DSpaceClient', autospec=True)
 class TestSuite(unittest.TestCase):
 
     def setUp(self):
@@ -24,48 +31,46 @@ class TestSuite(unittest.TestCase):
             password=self.DSPACE_API_PASSWORD
         )
 
-    def test_smoke(self):
+    def test_smoke(
+        self, mock_client, mock_item, mock_bundle, mock_bitstream,
+        mock_psycopg2, mock_subprocess
+    ):
         """
         Scenario:  test basic operation
         """
-        with (
-            mock.patch('dspace_utils.thumbnails.DSpaceClient', autospec=True) as mock_client,
-            mock.patch('dspace_utils.thumbnails.Item', autospec=True) as mock_item,
-            mock.patch('dspace_utils.thumbnails.Bundle', autospec=True) as mock_bundle,
-            mock.patch('dspace_utils.thumbnails.Bitstream', autospec=True) as mock_bitstream,
-            mock.patch('dspace_utils.thumbnails.psycopg2', autospec=True) as mock_psycopg2,
-            mock.patch('dspace_utils.thumbnails.subprocess', autospec=True) as mock_subprocess
-        ):
 
-            # make up some fake bundles
-            bundles = [Bundle(), Bundle()]
-            bundles[0].uuid = '12345678-1234-1234-1234-123456789abc'
-            bundles[0].name = 'ORIGINAL'
-            bundles[1].uuid = '12345678-1234-1234-1234-123456789abd'
-            bundles[1].name = 'THUMBNAIL'
-            mock_client.return_value.get_bundles.return_value = bundles
+        # make up some fake bundles
+        bundles = [Bundle(), Bundle()]
+        bundles[0].uuid = '12345678-1234-1234-1234-123456789abc'
+        bundles[0].name = 'ORIGINAL'
+        bundles[1].uuid = '12345678-1234-1234-1234-123456789abd'
+        bundles[1].name = 'THUMBNAIL'
+        mock_client.return_value.get_bundles.return_value = bundles
 
-            mock_psycopg2.connect.return_value.cursor.return_value.fetchone.return_value = (10,)  # noqa : E501
-            # make up some fake bitstreams
-            bitstreams = [mock_bitstream(), mock_bitstream()]
-            bitstreams[0].uuid = '12345678-1234-1234-1234-123456789abc'
-            bitstreams[0].name = 'ORIGINAL'
-            bitstreams[1].uuid = '12345678-1234-1234-1234-123456789abd'
-            bitstreams[1].name = 'THUMBNAIL'
-            mock_client.return_value.get_bitstreams.return_value = bitstreams
+        mock_psycopg2.connect.return_value.cursor.return_value.fetchone.return_value = (10,)  # noqa : E501
+        # make up some fake bitstreams
+        bitstreams = [mock_bitstream(), mock_bitstream()]
+        bitstreams[0].uuid = '12345678-1234-1234-1234-123456789abc'
+        bitstreams[0].name = 'ORIGINAL'
+        bitstreams[1].uuid = '12345678-1234-1234-1234-123456789abd'
+        bitstreams[1].name = 'THUMBNAIL'
+        mock_client.return_value.get_bitstreams.return_value = bitstreams
 
-            # make up downloaded content for the PDF bitstream
-            Response = namedtuple('Response', ['content'])
-            r = Response(b'\xde\xad\xbe\xef')
-            mock_client.return_value.download_bitstream.return_value = r
+        # make up downloaded content for the PDF bitstream
+        Response = namedtuple('Response', ['content'])
+        r = Response(b'\xde\xad\xbe\xef')
+        mock_client.return_value.download_bitstream.return_value = r
 
-            mock_subprocess.Popen.return_value.returncode = 0
-            mock_subprocess.Popen.return_value.communicate.return_value = (b'', b'')  # noqa : E501
+        mock_subprocess.Popen.return_value.returncode = 0
+        mock_subprocess.Popen.return_value.communicate.return_value = b'', b''
 
-            with ThumbnailGenerator('1/12345', **self.dspace_kwargs) as o:
-                o.run()
+        with ThumbnailGenerator('1/12345', **self.dspace_kwargs) as o:
+            o.run()
 
-    def test_no_username(self):
+    def test_no_username(
+        self, mock_client, mock_item, mock_bundle, mock_bitstream,
+        mock_psycopg2, mock_subprocess
+    ):
         """
         Scenario:  no username is provided
 
@@ -74,18 +79,15 @@ class TestSuite(unittest.TestCase):
         handle = '1/18274'
 
         with (
-            mock.patch('dspace_utils.thumbnails.DSpaceClient', autospec=True),
-            mock.patch.dict(
-                'dspace_utils.thumbnails.os.environ', {}, clear=True
-            ),
-            mock.patch.dict(
-                self.dspace_kwargs, {}, clear=True
-            ),
+            patch.dict(self.dspace_kwargs, {}, clear=True),
         ):
             with self.assertRaises(RuntimeError):
-               ThumbnailGenerator(handle, **self.dspace_kwargs)
+                ThumbnailGenerator(handle, **self.dspace_kwargs)
 
-    def test_username_via_environment_but_no_password(self):
+    def test_username_via_environment_but_no_password(
+        self, mock_client, mock_item, mock_bundle, mock_bitstream,
+        mock_psycopg2, mock_subprocess
+    ):
         """
         Scenario:  a username is provided, but not a password
 
@@ -94,17 +96,19 @@ class TestSuite(unittest.TestCase):
         handle = '1/18274'
 
         with (
-            mock.patch.dict(
+            patch.dict(
                 'dspace_utils.thumbnails.os.environ',
                 {'DSPACE_API_USERNAME': 'somebody'},
                 clear=True
             ),
-            mock.patch('dspace_utils.thumbnails.DSpaceClient', autospec=True)
         ):
             with self.assertRaises(RuntimeError):
                 ThumbnailGenerator(handle)
 
-    def test_username_via_environment_variable_password_vi_cmdline(self):
+    def test_username_via_environment_variable_password_vi_cmdline(
+        self, mock_client, mock_bundle, mock_bitstream, mock_item,
+        mock_psycopg2, mock_subprocess
+    ):
         """
         Scenario:  the username is not provided via the command line, but is
         provided via environment variable
@@ -114,11 +118,10 @@ class TestSuite(unittest.TestCase):
         handle = '1/18274'
 
         with (
-            mock.patch.dict(
+            patch.dict(
                 'dspace_utils.thumbnails.os.environ',
                 {'DSPACE_API_USERNAME': 'somebody'},
                 clear=True
             ),
-            mock.patch('dspace_utils.thumbnails.DSpaceClient', autospec=True)
         ):
             ThumbnailGenerator(handle, password='somepass')
