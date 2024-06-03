@@ -35,6 +35,9 @@ class ThumbnailGenerator(object):
         if username is None:
             username = os.environ.get('DSPACE_API_USERNAME', None)
 
+        if password is None:
+            password = os.environ.get('DSPACE_API_PASSWORD', None)
+
         if username is None or password is None:
             raise RuntimeError("Username or password not provided.")
 

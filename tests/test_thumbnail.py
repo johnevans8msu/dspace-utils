@@ -105,7 +105,7 @@ class TestSuite(unittest.TestCase):
             with self.assertRaises(RuntimeError):
                 ThumbnailGenerator(handle)
 
-    def test_username_via_environment_variable_password_vi_cmdline(
+    def test_username_via_environment_variable_password_via_cmdline(
         self, mock_client, mock_bundle, mock_bitstream, mock_item,
         mock_psycopg2, mock_subprocess
     ):
@@ -125,3 +125,23 @@ class TestSuite(unittest.TestCase):
             ),
         ):
             ThumbnailGenerator(handle, password='somepass')
+
+    def test_credentials_via_environment_variable(
+        self, mock_client, mock_bundle, mock_bitstream, mock_item,
+        mock_psycopg2, mock_subprocess
+    ):
+        """
+        Scenario:  both username and password are provided via environment
+        variables
+
+        Expected result:  The thumbnail generator is constructed with no
+        errors
+        """
+        env = {
+            'DSPACE_API_USERNAME': 'somebody',
+            'DSPACE_API_PASSWORD': 'somepass'
+        }
+        with (
+            patch.dict('dspace_utils.thumbnails.os.environ', env, clear=True)
+        ):
+            ThumbnailGenerator('1/12345')
