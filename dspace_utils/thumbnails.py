@@ -2,6 +2,7 @@
 import os
 import subprocess
 import sys
+import tempfile
 
 # 3rd party library imports
 from dspace_rest_client.client import DSpaceClient
@@ -116,25 +117,26 @@ class ThumbnailGenerator(object):
         Create a thumbnail JPEG image from the PDF document.
         """
 
-        document = 'document.pdf'
-        with open('document.pdf', mode='wb') as f:
-            f.write(r.content)
+        with tempfile.TemporaryDirectory() as tdir:
+            document = f'{tdir}/document.pdf'
+            with open(document, mode='wb') as f:
+                f.write(r.content)
 
-        # create the new thumbnail
-        thumbnail = f'{document}.jpg'
-        cmd = (
-            f'gm convert -thumbnail 160x160 '
-            f'-flatten {document}[{page_number}] {thumbnail}'
-        )
-        p = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE)
-        p.wait()
+            # create the new thumbnail
+            thumbnail = f'{tdir}/{document}.jpg'
+            cmd = (
+                f'gm convert -thumbnail 160x160 '
+                f'-flatten {document}[{page_number}] {thumbnail}'
+            )
+            p = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE)
+            p.wait()
 
-        stdout, stderr = p.communicate()
-        stdout = stdout.decode('utf-8')
+            stdout, stderr = p.communicate()
+            stdout = stdout.decode('utf-8')
 
-        if p.returncode != 0:
-            stderr = stderr.decode('utf-8')
-            raise RuntimeError(stderr)
+            if p.returncode != 0:
+                stderr = stderr.decode('utf-8')
+                raise RuntimeError(stderr)
 
     def create_new_thumbnail(self, item):
         """
