@@ -13,7 +13,7 @@ from dspace_utils.thumbnails import Bundle
 
 @patch.dict('dspace_utils.thumbnails.os.environ', {}, clear=True)
 @patch('dspace_utils.thumbnails.subprocess', autospec=True)
-@patch('dspace_utils.thumbnails.psycopg2', autospec=True)
+@patch('dspace_utils.common.psycopg2', autospec=True)
 @patch('dspace_utils.thumbnails.Bitstream', autospec=True)
 @patch('dspace_utils.thumbnails.Bundle', autospec=True)
 @patch('dspace_utils.thumbnails.Item', autospec=True)

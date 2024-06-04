@@ -7,10 +7,12 @@ import tempfile
 # 3rd party library imports
 from dspace_rest_client.client import DSpaceClient
 from dspace_rest_client.models import Item, Bundle, Bitstream  # noqa : F401
-import psycopg2
+
+# local imports
+from .common import DSpaceCommon
 
 
-class ThumbnailGenerator(object):
+class ThumbnailGenerator(DSpaceCommon):
     """
     Generate thumbnail images for dspace instance
 
@@ -31,6 +33,7 @@ class ThumbnailGenerator(object):
     def __init__(
         self, handle, api_endpoint=None, username=None, password=None
     ):
+        super().__init__()
 
         if username is None:
             username = os.environ.get('DSPACE_API_USERNAME', None)
@@ -103,10 +106,6 @@ class ThumbnailGenerator(object):
         Retrieve the thumbnail pagenumber associated with the current item.
         """
 
-        # Get the page number of the expected thumbnail
-        conn = psycopg2.connect('postgres://tomcat@localhost/dspace')
-        cursor = conn.cursor()
-
         sql = """
             select text_value::int
             from metadatavalue m
@@ -114,8 +113,8 @@ class ThumbnailGenerator(object):
             where h.handle = %(handle)s
             and m.metadata_field_id = 160
         """
-        cursor.execute(sql, {'handle': self.handle})
-        page_number = cursor.fetchone()[0]
+        self.cursor.execute(sql, {'handle': self.handle})
+        page_number = self.cursor.fetchone()[0]
 
         return page_number
 
