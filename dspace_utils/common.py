@@ -18,6 +18,12 @@ class DSpaceCommon(object):
 
         self.setup_logging(verbose)
 
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type, exc_value, exc_traceback):
+        pass
+
     def setup_logging(self, log_level):
 
         level = getattr(logging, log_level.upper())

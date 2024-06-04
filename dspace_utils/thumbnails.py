@@ -61,12 +61,6 @@ class ThumbnailGenerator(DSpaceCommon):
 
         self.logger.info('authenticated to dspace instance')
 
-    def __enter__(self):
-        return self
-
-    def __exit__(self, exc_type, exc_value, exc_traceback):
-        pass
-
     def get_item_from_handle(self):
         """
         Locate the item tied to the current handle.
