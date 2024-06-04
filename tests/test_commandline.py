@@ -13,13 +13,16 @@ class TestSuite(unittest.TestCase):
     @mock.patch('dspace_utils.thumbnails.ThumbnailGenerator.run')
     def test_thumbnail_smoke(self, mock_run, mock_dspace_client):
         """
-        Scenario
+        Scenario:  invoke commandline utility
+
+        Expected result:
         """
 
         mock_run.new = lambda x: None
 
         new_argv = [
-            '', '1/1825', '--username', 'me', '--password', 'something'
+            '', '1/1825', '--username', 'me', '--password', 'something',
+            '--verbose', 'info'
         ]
         with mock.patch.object(sys, 'argv', new=new_argv):
             commandline.run_thumbnail_generator()
