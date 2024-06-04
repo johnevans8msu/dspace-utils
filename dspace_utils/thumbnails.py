@@ -71,7 +71,14 @@ class ThumbnailGenerator(DSpaceCommon):
         r = self.client.api_get(url, params)
         r.raise_for_status()
 
-        return Item(r.json())
+        item = Item(r.json())
+
+        msg = (
+            f"Constructed item with UUID {item.uuid} from handle {self.handle}"
+        )
+        self.logger.debug(msg)
+
+        return item
 
     def delete_thumbnail_bitstream(self, item):
         """
@@ -98,6 +105,9 @@ class ThumbnailGenerator(DSpaceCommon):
             r = self.client.api_patch(url, 'remove', path, None, retry=True)
             r.raise_for_status()
 
+            msg = f"Deleted bitstream {bitstream.uuid}."
+            self.logger.debug(msg)
+
     def get_database_pagenumber(self):
         """
         Retrieve the thumbnail pagenumber associated with the current item.
@@ -113,6 +123,9 @@ class ThumbnailGenerator(DSpaceCommon):
         self.cursor.execute(sql, {'handle': self.handle})
         page_number = self.cursor.fetchone()[0]
 
+        msg = f"Retrieve page number {page_number} for the thumbnail"
+        self.logger.debug(msg)
+
         return page_number
 
     def create_thumbnail_image(
@@ -124,6 +137,9 @@ class ThumbnailGenerator(DSpaceCommon):
 
         with open(orig_doc_path, mode='wb') as f:
             f.write(r.content)
+
+            msg = f"Wrote original document content to {orig_doc_path}"
+            self.logger.debug(msg)
 
         # create the new thumbnail
         cmd = (
@@ -139,6 +155,9 @@ class ThumbnailGenerator(DSpaceCommon):
         if p.returncode != 0:
             stderr = stderr.decode('utf-8')
             raise RuntimeError(stderr)
+
+        msg = f"Created new thumbnail image at {new_thumbnail_path}"
+        self.logger.debug(msg)
 
     def create_new_thumbnail(self, item):
         """
@@ -205,6 +224,8 @@ class ThumbnailGenerator(DSpaceCommon):
                 mime='image/jpeg',
                 metadata=metadata
             )
+
+            self.logger.debug("Created new thumbnail bitstream.")
 
     def run(self):
 
