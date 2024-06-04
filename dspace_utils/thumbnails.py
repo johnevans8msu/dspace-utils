@@ -31,9 +31,10 @@ class ThumbnailGenerator(DSpaceCommon):
     """
 
     def __init__(
-        self, handle, api_endpoint=None, username=None, password=None
+        self, handle, verbose='info', api_endpoint=None, username=None,
+        password=None
     ):
-        super().__init__()
+        super().__init__(verbose)
 
         if username is None:
             username = os.environ.get('DSPACE_API_USERNAME', None)
@@ -57,6 +58,8 @@ class ThumbnailGenerator(DSpaceCommon):
             fake_user_agent=True
         )
         self.client.authenticate()
+
+        self.logger.info('authenticated to dspace instance')
 
     def __enter__(self):
         return self
