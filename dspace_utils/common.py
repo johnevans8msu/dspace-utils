@@ -12,9 +12,9 @@ import yaml
 
 class DSpaceCommon(object):
 
-    def __init__(self, verbose, username, password, api):
+    def __init__(self, verbose, username, password, api, postgres_uri):
 
-        self.setup_credentials(username, password, api)
+        self.setup_credentials(username, password, api, postgres_uri)
 
         # Get the page number of the expected thumbnail
         self.conn = psycopg2.connect('postgres://tomcat@localhost/dspace')
@@ -28,11 +28,12 @@ class DSpaceCommon(object):
     def __exit__(self, exc_type, exc_value, exc_traceback):
         pass
 
-    def setup_credentials(self, username, password, api):
+    def setup_credentials(self, username, password, api, postgres_uri):
 
         self.username = username
         self.password = password
         self.api = api
+        self.postgres_uri = postgres_uri
 
         p = pathlib.Path.home() / '.config/dspace-utils/dspace.yml'
         try:
@@ -49,6 +50,9 @@ class DSpaceCommon(object):
 
             if self.api is None:
                 self.api = config['api']
+
+            if self.postgres_uri is None:
+                self.postgres_uri = config['postgres_uri']
 
         except KeyError as e:
             msg = (

@@ -31,9 +31,11 @@ class ThumbnailGenerator(DSpaceCommon):
 
     def __init__(
         self, handle, verbose='info', api_endpoint=None, username=None,
-        password=None
+        password=None, postgres_uri=None
     ):
-        super().__init__(verbose, username, password, api_endpoint)
+        super().__init__(
+            verbose, username, password, api_endpoint, postgres_uri
+        )
 
         self.handle = handle
 

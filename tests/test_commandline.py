@@ -22,7 +22,7 @@ class TestSuite(unittest.TestCase):
 
         new_argv = [
             '', '1/1825', '--username', 'me', '--password', 'something',
-            '--verbose', 'info'
+            '--verbose', 'info', '--postgres-uri', 'some-uri'
         ]
         with mock.patch.object(sys, 'argv', new=new_argv):
             commandline.run_thumbnail_generator()

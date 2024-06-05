@@ -28,6 +28,31 @@ class TestSuite(unittest.TestCase):
             password=self.DSPACE_API_PASSWORD
         )
 
+    def test_no_postgresql_uri(
+        self, mock_client, mock_item, mock_bundle, mock_bitstream,
+        mock_psycopg2, mock_subprocess
+    ):
+        """
+        Scenario:  no postgresql URI is provided either by parameter or config
+        file
+
+        Expected result:  RuntimeError
+        """
+        handle = '1/18274'
+
+        config = {
+            'username': 'someuser',
+            'password': 'somepass',
+            'api': 'http://localhost/server/api',
+        }
+        s = json.dumps(config)
+        with (
+            patch.dict(self.dspace_kwargs, {}, clear=True),
+            patch('dspace_utils.common.pathlib.Path.read_text', return_value=s)
+        ):
+            with self.assertRaises(RuntimeError):
+                ThumbnailGenerator(handle, **self.dspace_kwargs)
+
     def test_no_username(
         self, mock_client, mock_item, mock_bundle, mock_bitstream,
         mock_psycopg2, mock_subprocess
@@ -91,7 +116,7 @@ class TestSuite(unittest.TestCase):
         config = {
             'username': 'somebody',
             'api': 'http://localhost/server/api',
-            'postgresql_uri': 'postgresql://dspace@localhost/dspace',
+            'postgres_uri': 'postgresql://dspace@localhost/dspace',
         }
         s = json.dumps(config)
         with (
@@ -113,7 +138,7 @@ class TestSuite(unittest.TestCase):
             'username': 'somebody',
             'password': 'somepass',
             'api': 'http://localhost/server/api',
-            'postgresql_uri': 'postgresql://dspace@localhost/dspace',
+            'postgres_uri': 'postgresql://dspace@localhost/dspace',
         }
         s = json.dumps(config)
         with (

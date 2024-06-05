@@ -23,6 +23,9 @@ def run_thumbnail_generator():
     help = "Authenticate to dspace instance with this password."
     parser.add_argument('-p', '--password', help=help)
 
+    help = "Authenticate to postgresql instance with this URI."
+    parser.add_argument('--postgres-uri', help=help)
+
     parser.add_argument(
         '--verbose', help='Logging level',
         choices=_LOGGING_VERBOSITY_CHOICES,
@@ -36,6 +39,7 @@ def run_thumbnail_generator():
         api_endpoint=args.api_endpoint,
         username=args.username,
         password=args.password,
-        verbose=args.verbose
+        verbose=args.verbose,
+        postgres_uri=args.postgres_uri
     ) as p:
         p.run()
