@@ -1,5 +1,4 @@
 # standard library imports
-import os
 import subprocess
 import sys
 import tempfile
@@ -34,16 +33,7 @@ class ThumbnailGenerator(DSpaceCommon):
         self, handle, verbose='info', api_endpoint=None, username=None,
         password=None
     ):
-        super().__init__(verbose)
-
-        if username is None:
-            username = os.environ.get('DSPACE_API_USERNAME', None)
-
-        if password is None:
-            password = os.environ.get('DSPACE_API_PASSWORD', None)
-
-        if username is None or password is None:
-            raise RuntimeError("Username or password not provided.")
+        super().__init__(verbose, username, password, api_endpoint)
 
         self.handle = handle
 

@@ -1,17 +1,16 @@
 # standard library imports
 from collections import namedtuple
+import json
 import unittest
 from unittest.mock import patch
 
 # 3rd party library imports
-# from dspace_rest_client.client import DSpaceClient
 
 # local imports
 from dspace_utils import ThumbnailGenerator
 from dspace_utils.thumbnails import Bundle
 
 
-@patch.dict('dspace_utils.thumbnails.os.environ', {}, clear=True)
 @patch('dspace_utils.thumbnails.subprocess', autospec=True)
 @patch('dspace_utils.common.psycopg2', autospec=True)
 @patch('dspace_utils.thumbnails.Bitstream', autospec=True)
@@ -116,14 +115,21 @@ class TestSuite(unittest.TestCase):
         mock_psycopg2, mock_subprocess
     ):
         """
-        Scenario:  no username is provided
+        Scenario:  no username is provided either by parameter or config file
 
         Expected result:  RuntimeError
         """
         handle = '1/18274'
 
+        config = {
+            'password': 'somepass',
+            'api': 'http://localhost/server/api',
+            'postgresql_uri': 'postgresql://dspace@localhost/dspace',
+        }
+        s = json.dumps(config)
         with (
             patch.dict(self.dspace_kwargs, {}, clear=True),
+            patch('dspace_utils.common.pathlib.Path.read_text', return_value=s)
         ):
             with self.assertRaises(RuntimeError):
                 ThumbnailGenerator(handle, **self.dspace_kwargs)
@@ -133,59 +139,66 @@ class TestSuite(unittest.TestCase):
         mock_psycopg2, mock_subprocess
     ):
         """
-        Scenario:  a username is provided, but not a password
+        Scenario:  a username is provided via command line, but no password
+        either by parameter or config file
 
         Expected result:  RuntimeError
         """
         handle = '1/18274'
 
+        config = {
+            'username': 'somebody',
+            'api': 'http://localhost/server/api',
+            'postgresql_uri': 'postgresql://dspace@localhost/dspace',
+        }
+        s = json.dumps(config)
         with (
-            patch.dict(
-                'dspace_utils.thumbnails.os.environ',
-                {'DSPACE_API_USERNAME': 'somebody'},
-                clear=True
-            ),
+            patch('dspace_utils.common.pathlib.Path.read_text', return_value=s)
         ):
             with self.assertRaises(RuntimeError):
                 ThumbnailGenerator(handle)
 
-    def test_username_via_environment_variable_password_via_cmdline(
+    def test_username_via_config_and_password_via_cmdline(
         self, mock_client, mock_bundle, mock_bitstream, mock_item,
         mock_psycopg2, mock_subprocess
     ):
         """
         Scenario:  the username is not provided via the command line, but is
-        provided via environment variable
+        provided via config file
 
         Expected result:  no errors
         """
         handle = '1/18274'
 
+        config = {
+            'username': 'somebody',
+            'api': 'http://localhost/server/api',
+            'postgresql_uri': 'postgresql://dspace@localhost/dspace',
+        }
+        s = json.dumps(config)
         with (
-            patch.dict(
-                'dspace_utils.thumbnails.os.environ',
-                {'DSPACE_API_USERNAME': 'somebody'},
-                clear=True
-            ),
+            patch('dspace_utils.common.pathlib.Path.read_text', return_value=s)
         ):
             ThumbnailGenerator(handle, password='somepass')
 
-    def test_credentials_via_environment_variable(
+    def test_credentials_via_config_file(
         self, mock_client, mock_bundle, mock_bitstream, mock_item,
         mock_psycopg2, mock_subprocess
     ):
         """
-        Scenario:  both username and password are provided via environment
-        variables
+        Scenario:  all credentials provided via config file
 
         Expected result:  The thumbnail generator is constructed with no
         errors
         """
-        env = {
-            'DSPACE_API_USERNAME': 'somebody',
-            'DSPACE_API_PASSWORD': 'somepass'
+        config = {
+            'username': 'somebody',
+            'password': 'somepass',
+            'api': 'http://localhost/server/api',
+            'postgresql_uri': 'postgresql://dspace@localhost/dspace',
         }
+        s = json.dumps(config)
         with (
-            patch.dict('dspace_utils.thumbnails.os.environ', env, clear=True)
+            patch('dspace_utils.common.pathlib.Path.read_text', return_value=s)
         ):
             ThumbnailGenerator('1/12345')

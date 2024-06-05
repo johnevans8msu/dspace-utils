@@ -9,7 +9,6 @@ from unittest.mock import patch
 from dspace_utils import ThumbnailGenerator
 
 
-@patch.dict('dspace_utils.thumbnails.os.environ', {}, clear=True)
 @patch('dspace_utils.common.psycopg2', autospec=True)
 @patch('dspace_utils.thumbnails.DSpaceClient', autospec=True)
 class TestSuite(unittest.TestCase):
