@@ -17,7 +17,7 @@ class DSpaceCommon(object):
         self.setup_credentials(username, password, api, postgres_uri)
 
         # Get the page number of the expected thumbnail
-        self.conn = psycopg2.connect('postgres://tomcat@localhost/dspace')
+        self.conn = psycopg2.connect(self.postgres_uri)
         self.cursor = self.conn.cursor()
 
         self.setup_logging(verbose)
