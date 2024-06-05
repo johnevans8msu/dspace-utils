@@ -1,6 +1,5 @@
 # standard library imports
 from collections import namedtuple
-import unittest
 from unittest.mock import patch
 
 # 3rd party library imports
@@ -8,6 +7,7 @@ from unittest.mock import patch
 # local imports
 from dspace_utils import ThumbnailGenerator
 from dspace_utils.thumbnails import Bundle
+from .common import TestCommon
 
 
 @patch('dspace_utils.thumbnails.subprocess', autospec=True)
@@ -16,21 +16,7 @@ from dspace_utils.thumbnails import Bundle
 @patch('dspace_utils.thumbnails.Bundle', autospec=True)
 @patch('dspace_utils.thumbnails.Item', autospec=True)
 @patch('dspace_utils.thumbnails.DSpaceClient', autospec=True)
-class TestSuite(unittest.TestCase):
-
-    def setUp(self):
-
-        self.DSPACE_API_ENDPOINT = 'https://lib1.lib.montana.edu/server/api'
-        self.DSPACE_API_USERNAME = 'someone'
-        self.DSPACE_API_PASSWORD = 'somepass'
-        self.DSPACE_POSTGRES_URI = 'postgres://dspace@localhost/dspace'
-
-        self.dspace_kwargs = dict(
-            api_endpoint=self.DSPACE_API_ENDPOINT,
-            username=self.DSPACE_API_USERNAME,
-            password=self.DSPACE_API_PASSWORD,
-            postgres_uri=self.DSPACE_POSTGRES_URI
-        )
+class TestSuite(TestCommon):
 
     def test_smoke(
         self, mock_client, mock_item, mock_bundle, mock_bitstream,
