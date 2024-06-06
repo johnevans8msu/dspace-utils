@@ -9,7 +9,24 @@ _LOGGING_VERBOSITY_CHOICES = ["critical", "error", "warning", "info", "debug"]
 
 def run_thumbnail_generator():
 
-    parser = argparse.ArgumentParser()
+    epilog = (
+        "Rather than use command line arguments for passing credentials, it \n"
+        "is recommended to make use of a configuration file.  This YAML file\n"
+        "should be located at $HOME/.config/dspace-utils/dspace.yml.  The \n"
+        "format of the file should be as follows:\n\n"
+        "    +----------------------------------------------------------\n"
+        "    | config:\n"
+        "    |     username: the-username\n"
+        "    |     password: the-user-password\n"
+        "    |     api: DSpace API endpoint,\n"
+        "    |          e.g. https://localhost/server/api\n"
+        "    |     postgres_uri: postgres URI,\n"
+        "    |          e.g. postgres://dspace:password@localhost/dspace\n"
+    )
+    parser = argparse.ArgumentParser(
+        epilog=epilog,
+        formatter_class=argparse.RawDescriptionHelpFormatter
+    )
 
     parser.add_argument('handle')
 
