@@ -1,3 +1,8 @@
+Jun 05, 2024 - v0.0.3
+    Lot of refactoring.
+    Add support for logging.
+    Swap out support for environment variables for config file.
+
 Jun 04, 2024 - v0.0.2
     Match original document name in new thumbnail name
     Add command line utility for thumbnail generation
