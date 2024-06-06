@@ -25,22 +25,17 @@ class TestSuite(TestCommon):
         Scenario:  no postgresql URI is provided either by parameter or config
         file
 
-        Expected result:  RuntimeError
+        Expected result:  KeyError
         """
         handle = '1/18274'
 
-        config = {
-            'username': 'someuser',
-            'password': 'somepass',
-            'api': 'http://localhost/server/api',
-        }
-        s = json.dumps(config)
+        self.config.pop('postgres_uri')
+        s = json.dumps(self.config)
         with (
-            patch.dict(self.dspace_kwargs, {}, clear=True),
             patch('dspace_utils.common.pathlib.Path.read_text', return_value=s)
         ):
-            with self.assertRaises(RuntimeError):
-                ThumbnailGenerator(handle, **self.dspace_kwargs)
+            with self.assertRaises(KeyError):
+                ThumbnailGenerator(handle)
 
     def test_no_username(
         self, mock_client, mock_item, mock_bundle, mock_bitstream,
@@ -49,71 +44,57 @@ class TestSuite(TestCommon):
         """
         Scenario:  no username is provided either by parameter or config file
 
-        Expected result:  RuntimeError
+        Expected result:  KeyError
         """
         handle = '1/18274'
 
-        config = {
-            'password': 'somepass',
-            'api': 'http://localhost/server/api',
-            'postgresql_uri': 'postgresql://dspace@localhost/dspace',
-        }
-        s = json.dumps(config)
+        self.config.pop('password')
+        s = json.dumps(self.config)
         with (
-            patch.dict(self.dspace_kwargs, {}, clear=True),
             patch('dspace_utils.common.pathlib.Path.read_text', return_value=s)
         ):
-            with self.assertRaises(RuntimeError):
-                ThumbnailGenerator(handle, **self.dspace_kwargs)
+            with self.assertRaises(KeyError):
+                ThumbnailGenerator(handle)
 
-    def test_username_via_environment_but_no_password(
+    def test_no_password(
         self, mock_client, mock_item, mock_bundle, mock_bitstream,
         mock_psycopg2, mock_subprocess
     ):
         """
-        Scenario:  a username is provided via command line, but no password
-        either by parameter or config file
+        Scenario:  no password either by parameter or config file
 
-        Expected result:  RuntimeError
+        Expected result:  KeyError
         """
         handle = '1/18274'
 
-        config = {
-            'username': 'somebody',
-            'api': 'http://localhost/server/api',
-            'postgresql_uri': 'postgresql://dspace@localhost/dspace',
-        }
-        s = json.dumps(config)
+        self.config.pop('password')
+        s = json.dumps(self.config)
         with (
             patch('dspace_utils.common.pathlib.Path.read_text', return_value=s)
         ):
-            with self.assertRaises(RuntimeError):
+            with self.assertRaises(KeyError):
                 ThumbnailGenerator(handle)
 
-    def test_username_via_config_and_password_via_cmdline(
-        self, mock_client, mock_bundle, mock_bitstream, mock_item,
+    def test_api_endpoint(
+        self, mock_client, mock_item, mock_bundle, mock_bitstream,
         mock_psycopg2, mock_subprocess
     ):
         """
-        Scenario:  the username is not provided via the command line, but is
-        provided via config file
+        Scenario:  no API endpoint in the config file
 
-        Expected result:  no errors
+        Expected result:  KeyError
         """
         handle = '1/18274'
 
-        config = {
-            'username': 'somebody',
-            'api': 'http://localhost/server/api',
-            'postgres_uri': 'postgresql://dspace@localhost/dspace',
-        }
-        s = json.dumps(config)
+        self.config.pop('api_endpoint')
+        s = json.dumps(self.config)
         with (
             patch('dspace_utils.common.pathlib.Path.read_text', return_value=s)
         ):
-            ThumbnailGenerator(handle, password='somepass')
+            with self.assertRaises(KeyError):
+                ThumbnailGenerator(handle)
 
-    def test_credentials_via_config_file(
+    def test_all_credentials_via_config_file(
         self, mock_client, mock_bundle, mock_bitstream, mock_item,
         mock_psycopg2, mock_subprocess
     ):
@@ -126,7 +107,7 @@ class TestSuite(TestCommon):
         config = {
             'username': 'somebody',
             'password': 'somepass',
-            'api': 'http://localhost/server/api',
+            'api_endpoint': 'http://localhost/server/api',
             'postgres_uri': 'postgresql://dspace@localhost/dspace',
         }
         s = json.dumps(config)

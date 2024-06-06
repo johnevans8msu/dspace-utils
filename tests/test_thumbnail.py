@@ -1,5 +1,6 @@
 # standard library imports
 from collections import namedtuple
+import json
 from unittest.mock import patch
 
 # 3rd party library imports
@@ -51,7 +52,13 @@ class TestSuite(TestCommon):
         mock_subprocess.Popen.return_value.returncode = 0
         mock_subprocess.Popen.return_value.communicate.return_value = b'', b''
 
-        with ThumbnailGenerator('1/12345', **self.dspace_kwargs) as o:
+        with (
+            patch(
+                'dspace_utils.common.pathlib.Path.read_text',
+                return_value=json.dumps(self.config),
+            ),
+            ThumbnailGenerator('1/12345') as o,
+        ):
             o.run()
 
     def test_no_bitstreams_for_thumbnails_bundle(
@@ -95,5 +102,11 @@ class TestSuite(TestCommon):
         mock_subprocess.Popen.return_value.returncode = 0
         mock_subprocess.Popen.return_value.communicate.return_value = b'', b''
 
-        with ThumbnailGenerator('1/12345', **self.dspace_kwargs) as o:
+        with (
+            patch(
+                'dspace_utils.common.pathlib.Path.read_text',
+                return_value=json.dumps(self.config),
+            ),
+            ThumbnailGenerator('1/12345') as o,
+        ):
             o.run()

@@ -12,9 +12,9 @@ import yaml
 
 class DSpaceCommon(object):
 
-    def __init__(self, verbose, username, password, api, postgres_uri):
+    def __init__(self, verbose):
 
-        self.setup_credentials(username, password, api, postgres_uri)
+        self.setup_credentials()
 
         # Get the page number of the expected thumbnail
         self.conn = psycopg2.connect(self.postgres_uri)
@@ -28,38 +28,15 @@ class DSpaceCommon(object):
     def __exit__(self, exc_type, exc_value, exc_traceback):
         pass
 
-    def setup_credentials(self, username, password, api, postgres_uri):
-
-        self.username = username
-        self.password = password
-        self.api = api
-        self.postgres_uri = postgres_uri
+    def setup_credentials(self):
 
         p = pathlib.Path.home() / '.config/dspace-utils/dspace.yml'
-        try:
-            config = yaml.safe_load(p.read_text())
-        except FileNotFoundError:
-            config = None
+        config = yaml.safe_load(p.read_text())
 
-        try:
-            if self.username is None:
-                self.username = config['username']
-
-            if self.password is None:
-                self.password = config['password']
-
-            if self.api is None:
-                self.api = config['api']
-
-            if self.postgres_uri is None:
-                self.postgres_uri = config['postgres_uri']
-
-        except KeyError as e:
-            msg = (
-                'Not all credentials provided, neither by config file nor by '
-                f'parameters.  {e}'
-            )
-            raise RuntimeError(msg)
+        self.username = config['username']
+        self.password = config['password']
+        self.api_endpoint = config['api_endpoint']
+        self.postgres_uri = config['postgres_uri']
 
     def setup_logging(self, log_level):
 

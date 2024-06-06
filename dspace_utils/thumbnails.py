@@ -29,24 +29,15 @@ class ThumbnailGenerator(DSpaceCommon):
         REST interface wrapper
     """
 
-    def __init__(
-        self, handle, verbose='info', api_endpoint=None, username=None,
-        password=None, postgres_uri=None
-    ):
-        super().__init__(
-            verbose, username, password, api_endpoint, postgres_uri
-        )
+    def __init__(self, handle, verbose='info'):
+        super().__init__(verbose)
 
         self.handle = handle
 
-        self.api_endpoint = api_endpoint
-        self.username = username
-        self.password = password
-
         self.client = DSpaceClient(
-            api_endpoint=api_endpoint,
-            username=username,
-            password=password,
+            api_endpoint=self.api_endpoint,
+            username=self.username,
+            password=self.password,
             fake_user_agent=True
         )
         self.client.authenticate()

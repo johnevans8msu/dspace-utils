@@ -1,13 +1,14 @@
 # standard library imports
+import json
 import sys
-import unittest
 from unittest import mock
 
 # local imports
 from dspace_utils import commandline
+from .common import TestCommon
 
 
-class TestSuite(unittest.TestCase):
+class TestSuite(TestCommon):
 
     @mock.patch('dspace_utils.thumbnails.DSpaceClient')
     @mock.patch('dspace_utils.thumbnails.ThumbnailGenerator.run')
@@ -23,9 +24,12 @@ class TestSuite(unittest.TestCase):
 
         mock_run.new = lambda x: None
 
-        new_argv = [
-            '', '1/1825', '--username', 'me', '--password', 'something',
-            '--verbose', 'info', '--postgres-uri', 'some-uri'
-        ]
-        with mock.patch.object(sys, 'argv', new=new_argv):
+        new_argv = ['', '1/1825', '--verbose', 'info']
+        with (
+            mock.patch(
+                'dspace_utils.common.pathlib.Path.read_text',
+                return_value=json.dumps(self.config),
+            ),
+            mock.patch.object(sys, 'argv', new=new_argv),
+        ):
             commandline.run_thumbnail_generator()
