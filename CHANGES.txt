@@ -1,3 +1,8 @@
+Jun 06, 2024 - v0.0.4
+    Refactor thumbnail page retrieval.
+    Add support for change item's owning collection.
+    Remove support of specifying credentials via command line.
+    
 Jun 05, 2024 - v0.0.3
     Lot of refactoring.
     Add support for logging.
