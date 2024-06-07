@@ -46,9 +46,6 @@ class ThumbnailGenerator(DSpaceCommon):
 
         bundles = self.client.get_bundles(item)
         bundle = next(filter(lambda x: x.name == 'THUMBNAIL', bundles), None)
-        if not bundle:
-            print('no thumbnail bundle')
-            sys.exit()
 
         bitstreams = self.client.get_bitstreams(bundle=bundle)
 
