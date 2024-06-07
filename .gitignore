@@ -1,2 +1,4 @@
 *.pyc
 *.swp
+.coverage
+dspace_utils.egg-info

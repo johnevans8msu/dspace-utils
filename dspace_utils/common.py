@@ -4,21 +4,24 @@ import pathlib
 import sys
 
 # 3rd party library imports
-import psycopg2
+from dspace_rest_client.client import DSpaceClient
+from dspace_rest_client.models import Item, Bundle, Bitstream  # noqa : F401
 import yaml
 
 # local imports
 
 
 class DSpaceCommon(object):
+    """
+    Attributes
+    ----------
+    client : DSpaceClient
+        3rd party wrapper for REST methods
+    """
 
     def __init__(self, verbose):
 
         self.setup_credentials()
-
-        # Get the page number of the expected thumbnail
-        self.conn = psycopg2.connect(self.postgres_uri)
-        self.cursor = self.conn.cursor()
 
         self.setup_logging(verbose)
 
@@ -38,6 +41,14 @@ class DSpaceCommon(object):
         self.api_endpoint = config['api_endpoint']
         self.postgres_uri = config['postgres_uri']
 
+        self.client = DSpaceClient(
+            api_endpoint=self.api_endpoint,
+            username=self.username,
+            password=self.password,
+            fake_user_agent=True
+        )
+        self.client.authenticate()
+
     def setup_logging(self, log_level):
 
         level = getattr(logging, log_level.upper())
@@ -53,3 +64,22 @@ class DSpaceCommon(object):
         h.setLevel(level)
         h.setFormatter(formatter)
         self.logger.addHandler(h)
+
+    def get_item_from_handle(self, handle):
+        """
+        Locate the item tied to the given handle.
+        """
+
+        url = f'{self.api_endpoint}/pid/find'
+        params = {'id': f'hdl:{handle}'}
+        r = self.client.api_get(url, params)
+        r.raise_for_status()
+
+        item = Item(r.json())
+
+        msg = (
+            f"Constructed item with UUID {item.uuid} from handle {handle}"
+        )
+        self.logger.debug(msg)
+
+        return item

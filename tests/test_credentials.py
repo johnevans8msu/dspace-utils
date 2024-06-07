@@ -10,11 +10,11 @@ from .common import TestCommon
 
 
 @patch('dspace_utils.thumbnails.subprocess', autospec=True)
-@patch('dspace_utils.common.psycopg2', autospec=True)
+@patch('dspace_utils.thumbnails.psycopg2', autospec=True)
 @patch('dspace_utils.thumbnails.Bitstream', autospec=True)
 @patch('dspace_utils.thumbnails.Bundle', autospec=True)
 @patch('dspace_utils.thumbnails.Item', autospec=True)
-@patch('dspace_utils.thumbnails.DSpaceClient', autospec=True)
+@patch('dspace_utils.common.DSpaceClient', autospec=True)
 class TestSuite(TestCommon):
 
     def test_no_postgresql_uri(
