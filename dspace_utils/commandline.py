@@ -10,6 +10,7 @@ _LOGGING_VERBOSITY_CHOICES = ["critical", "error", "warning", "info", "debug"]
 
 def run_thumbnail_generator():
 
+    description = "Try to force an item's thumbnail to be regenerated."
     epilog = (
         "Rather than use command line arguments for passing credentials, it \n"
         "is required to make use of a configuration file.  This YAML file\n"
@@ -25,6 +26,7 @@ def run_thumbnail_generator():
         "    |          e.g. postgres://dspace:password@localhost/dspace\n"
     )
     parser = argparse.ArgumentParser(
+        description=description,
         epilog=epilog,
         formatter_class=argparse.RawDescriptionHelpFormatter
     )
@@ -45,6 +47,7 @@ def run_thumbnail_generator():
 
 def run_change_owning_collection():
 
+    description = "Change the owning collection of an article/item."
     epilog = (
         "Rather than use command line arguments for passing credentials, it \n"
         "is required to make use of a configuration file.  This YAML file\n"
@@ -60,6 +63,7 @@ def run_change_owning_collection():
         "    |          e.g. postgres://dspace:password@localhost/dspace\n"
     )
     parser = argparse.ArgumentParser(
+        description=description,
         epilog=epilog,
         formatter_class=argparse.RawDescriptionHelpFormatter
     )
