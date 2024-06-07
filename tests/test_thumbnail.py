@@ -61,6 +61,53 @@ class TestSuite(TestCommon):
         ):
             o.run()
 
+    def test_thumbnail_creation_fails(
+        self, mock_client, mock_item, mock_bundle, mock_bitstream,
+        mock_psycopg2, mock_subprocess
+    ):
+        """
+        Scenario:  creating the thumbnail fails via the subprocess route
+
+        Expected result:  RuntimeError
+        """
+
+        # make up some fake bundles
+        bundles = [Bundle(), Bundle()]
+        bundles[0].uuid = '12345678-1234-1234-1234-123456789abc'
+        bundles[0].name = 'ORIGINAL'
+        bundles[1].uuid = '12345678-1234-1234-1234-123456789abd'
+        bundles[1].name = 'THUMBNAIL'
+        mock_client.return_value.get_bundles.return_value = bundles
+
+        mock_psycopg2.connect.return_value.cursor.return_value.fetchone.return_value = (10,)  # noqa : E501
+        # make up some fake bitstreams
+        bitstreams = [mock_bitstream(), mock_bitstream()]
+        bitstreams[0].uuid = '12345678-1234-1234-1234-123456789abc'
+        bitstreams[0].name = 'ORIGINAL'
+        bitstreams[1].uuid = '12345678-1234-1234-1234-123456789abd'
+        bitstreams[1].name = 'THUMBNAIL'
+        mock_client.return_value.get_bitstreams.return_value = bitstreams
+
+        # make up downloaded content for the PDF bitstream
+        Response = namedtuple('Response', ['content'])
+        r = Response(b'\xde\xad\xbe\xef')
+        mock_client.return_value.download_bitstream.return_value = r
+
+        mock_subprocess.Popen.return_value.returncode = -1
+        mock_subprocess.Popen.return_value.communicate.return_value = (
+            b'', b'Something went wrong'
+        )
+
+        with (
+            patch(
+                'dspace_utils.common.pathlib.Path.read_text',
+                return_value=json.dumps(self.config),
+            ),
+        ):
+            with self.assertRaises(RuntimeError):
+                with ThumbnailGenerator('1/12345') as o:
+                    o.run()
+
     def test_no_msu_thumbnail_page(
         self, mock_client, mock_item, mock_bundle, mock_bitstream,
         mock_psycopg2, mock_subprocess
