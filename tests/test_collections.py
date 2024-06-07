@@ -116,7 +116,8 @@ class TestSuite(TestCommon):
         #
         # The first two return Responses whos values we care not, as we
         # manufacture Items out of them (see above).  The 3rd call produces
-        # JSON, but we don't care about it.
+        # JSON, but we don't care about it.  We never get to the final 4th call
+        # referenced in the above test.
         #
         # 1 - don't care, produce an Item from result
         # 2 - don't care, produce an Item from result
@@ -129,6 +130,8 @@ class TestSuite(TestCommon):
         }
         mock_client.return_value.api_get.side_effect = [m1, m2, m3]
 
+        # The actual PUT operation returns a 400 code, but we never see that.
+        # Instead we rely on the response raising an exception.
         m = mock.create_autospec(requests.Response)
         m.raise_for_status.side_effect = requests.HTTPError
         mock_client.return_value.session.put.return_value = m
