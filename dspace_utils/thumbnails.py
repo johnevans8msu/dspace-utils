@@ -80,7 +80,11 @@ class ThumbnailGenerator(DSpaceCommon):
             and m.metadata_field_id = 160
         """
         self.cursor.execute(sql, {'handle': self.handle})
-        page_number = self.cursor.fetchone()[0]
+        try:
+            page_number = self.cursor.fetchone()[0]
+        except TypeError:
+            msg = "There was no thumbnail page defined for this item."
+            raise RuntimeError(msg)
 
         msg = f"Retrieve page number {page_number} for the thumbnail"
         self.logger.debug(msg)
@@ -118,12 +122,10 @@ class ThumbnailGenerator(DSpaceCommon):
         msg = f"Created new thumbnail image at {new_thumbnail_path}"
         self.logger.debug(msg)
 
-    def create_new_thumbnail(self, item):
+    def create_new_thumbnail(self, item, page_number):
         """
         Create a new thumbnail for the current image, overwriting the old.
         """
-
-        page_number = self.get_database_pagenumber()
 
         bundles = self.client.get_bundles(item)
         thumbnail_bundle = next(
@@ -189,5 +191,6 @@ class ThumbnailGenerator(DSpaceCommon):
     def run(self):
 
         item = self.get_item_from_handle(self.handle)
+        page_number = self.get_database_pagenumber()
         self.delete_thumbnail_bitstream(item)
-        self.create_new_thumbnail(item)
+        self.create_new_thumbnail(item, page_number)

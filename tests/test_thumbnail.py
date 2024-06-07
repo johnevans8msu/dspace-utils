@@ -61,6 +61,31 @@ class TestSuite(TestCommon):
         ):
             o.run()
 
+    def test_no_msu_thumbnail_page(
+        self, mock_client, mock_item, mock_bundle, mock_bitstream,
+        mock_psycopg2, mock_subprocess
+    ):
+        """
+        Scenario:  there is no MSU thumbnail page metadata value defined for
+        the item in question
+
+        Expected result:  RuntimeError
+        """
+
+        # There's no thumbnail page defined.
+        # The query to retrieve it returns no results.
+        mock_psycopg2.connect.return_value.cursor.return_value.fetchone.return_value = None  # noqa : E501
+
+        with (
+            patch(
+                'dspace_utils.common.pathlib.Path.read_text',
+                return_value=json.dumps(self.config),
+            ),
+            ThumbnailGenerator('1/12345') as o,
+        ):
+            with self.assertRaises(RuntimeError):
+                o.run()
+
     def test_no_bitstreams_for_thumbnails_bundle(
         self, mock_client, mock_item, mock_bundle, mock_bitstream,
         mock_psycopg2, mock_subprocess
@@ -80,6 +105,7 @@ class TestSuite(TestCommon):
         mock_client.return_value.get_bundles.return_value = bundles
 
         mock_psycopg2.connect.return_value.cursor.return_value.fetchone.return_value = (10,)  # noqa : E501
+
         # make up some fake bitstreams
         # We call get_bitstreams twice, once for the thumbnail bitstreams
         # (which will be empty) and once for the original bitstream, which
