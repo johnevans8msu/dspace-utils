@@ -4,8 +4,8 @@ import sys
 import tempfile
 
 # 3rd party library imports
-from dspace_rest_client.client import DSpaceClient
 from dspace_rest_client.models import Item, Bundle, Bitstream  # noqa : F401
+import psycopg2
 
 # local imports
 from .common import DSpaceCommon
@@ -34,34 +34,10 @@ class ThumbnailGenerator(DSpaceCommon):
 
         self.handle = handle
 
-        self.client = DSpaceClient(
-            api_endpoint=self.api_endpoint,
-            username=self.username,
-            password=self.password,
-            fake_user_agent=True
-        )
-        self.client.authenticate()
+        self.conn = psycopg2.connect(self.postgres_uri)
+        self.cursor = self.conn.cursor()
 
-        self.logger.info('authenticated to dspace instance')
-
-    def get_item_from_handle(self):
-        """
-        Locate the item tied to the current handle.
-        """
-
-        url = f'{self.api_endpoint}/pid/find'
-        params = {'id': f'hdl:{self.handle}'}
-        r = self.client.api_get(url, params)
-        r.raise_for_status()
-
-        item = Item(r.json())
-
-        msg = (
-            f"Constructed item with UUID {item.uuid} from handle {self.handle}"
-        )
-        self.logger.debug(msg)
-
-        return item
+        self.logger.info('PostgreSQL connection initiated.')
 
     def delete_thumbnail_bitstream(self, item):
         """
@@ -212,6 +188,6 @@ class ThumbnailGenerator(DSpaceCommon):
 
     def run(self):
 
-        item = self.get_item_from_handle()
+        item = self.get_item_from_handle(self.handle)
         self.delete_thumbnail_bitstream(item)
         self.create_new_thumbnail(item)
