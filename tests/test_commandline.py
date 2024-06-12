@@ -12,10 +12,7 @@ class TestSuite(TestCommon):
 
     @mock.patch('dspace_utils.common.DSpaceClient')
     @mock.patch('dspace_utils.thumbnails.ThumbnailGenerator.run')
-    @mock.patch('dspace_utils.thumbnails.psycopg2', autospec=True)
-    def test_thumbnail_smoke(
-        self, mock_postgres, mock_run, mock_dspace_client
-    ):
+    def test_thumbnail_smoke(self, mock_run, mock_dspace_client):
         """
         Scenario:  invoke commandline utility
 

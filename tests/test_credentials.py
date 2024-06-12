@@ -10,36 +10,15 @@ from .common import TestCommon
 
 
 @patch('dspace_utils.thumbnails.subprocess', autospec=True)
-@patch('dspace_utils.thumbnails.psycopg2', autospec=True)
 @patch('dspace_utils.thumbnails.Bitstream', autospec=True)
 @patch('dspace_utils.thumbnails.Bundle', autospec=True)
 @patch('dspace_utils.thumbnails.Item', autospec=True)
 @patch('dspace_utils.common.DSpaceClient', autospec=True)
 class TestSuite(TestCommon):
 
-    def test_no_postgresql_uri(
-        self, mock_client, mock_item, mock_bundle, mock_bitstream,
-        mock_psycopg2, mock_subprocess
-    ):
-        """
-        Scenario:  no postgresql URI is provided either by parameter or config
-        file
-
-        Expected result:  KeyError
-        """
-        handle = '1/18274'
-
-        self.config.pop('postgres_uri')
-        s = json.dumps(self.config)
-        with (
-            patch('dspace_utils.common.pathlib.Path.read_text', return_value=s)
-        ):
-            with self.assertRaises(KeyError):
-                ThumbnailGenerator(handle)
-
     def test_no_username(
         self, mock_client, mock_item, mock_bundle, mock_bitstream,
-        mock_psycopg2, mock_subprocess
+        mock_subprocess
     ):
         """
         Scenario:  no username is provided either by parameter or config file
@@ -58,7 +37,7 @@ class TestSuite(TestCommon):
 
     def test_no_password(
         self, mock_client, mock_item, mock_bundle, mock_bitstream,
-        mock_psycopg2, mock_subprocess
+        mock_subprocess
     ):
         """
         Scenario:  no password either by parameter or config file
@@ -77,7 +56,7 @@ class TestSuite(TestCommon):
 
     def test_api_endpoint(
         self, mock_client, mock_item, mock_bundle, mock_bitstream,
-        mock_psycopg2, mock_subprocess
+        mock_subprocess
     ):
         """
         Scenario:  no API endpoint in the config file
@@ -96,7 +75,7 @@ class TestSuite(TestCommon):
 
     def test_all_credentials_via_config_file(
         self, mock_client, mock_bundle, mock_bitstream, mock_item,
-        mock_psycopg2, mock_subprocess
+        mock_subprocess
     ):
         """
         Scenario:  all credentials provided via config file
@@ -108,7 +87,6 @@ class TestSuite(TestCommon):
             'username': 'somebody',
             'password': 'somepass',
             'api_endpoint': 'http://localhost/server/api',
-            'postgres_uri': 'postgresql://dspace@localhost/dspace',
         }
         s = json.dumps(config)
         with (

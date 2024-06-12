@@ -14,11 +14,10 @@ from dspace_utils import ThumbnailGenerator
 from .common import TestCommon
 
 
-@patch('dspace_utils.thumbnails.psycopg2', autospec=True)
 @patch('dspace_utils.common.DSpaceClient', autospec=True)
 class TestSuite(TestCommon):
 
-    def test_smoke(self, mock_client, mock_psycopg2):
+    def test_smoke(self, mock_client):
         """
         Scenario:  test basic operation with INFO logging
 

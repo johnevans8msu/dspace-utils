@@ -20,9 +20,7 @@ def run_thumbnail_generator():
         "    |     username: the-username\n"
         "    |     password: the-user-password\n"
         "    |     api: DSpace API endpoint,\n"
-        "    |          e.g. https://localhost/server/api\n"
-        "    |     postgres_uri: postgres URI,\n"
-        "    |          e.g. postgres://dspace:password@localhost/dspace\n\n"
+        "    |          e.g. https://localhost/server/api\n\n"
     )
     parser = argparse.ArgumentParser(
         description=description,
@@ -57,9 +55,7 @@ def run_change_owning_collection():
         "    |     username: the-username\n"
         "    |     password: the-user-password\n"
         "    |     api: DSpace API endpoint,\n"
-        "    |          e.g. https://localhost/server/api\n"
-        "    |     postgres_uri: postgres URI,\n"
-        "    |          e.g. postgres://dspace:password@localhost/dspace\n\n"
+        "    |          e.g. https://localhost/server/api\n\n"
     )
     parser = argparse.ArgumentParser(
         description=description,
@@ -99,9 +95,7 @@ def run_dump_item_metadata():
         "    |     username: the-username\n"
         "    |     password: the-user-password\n"
         "    |     api: DSpace API endpoint,\n"
-        "    |          e.g. https://localhost/server/api\n"
-        "    |     postgres_uri: postgres URI,\n"
-        "    |          e.g. postgres://dspace:password@localhost/dspace\n\n"
+        "    |          e.g. https://localhost/server/api\n\n"
     )
     parser = argparse.ArgumentParser(
         description=description,

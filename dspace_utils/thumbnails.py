@@ -4,7 +4,6 @@ import tempfile
 
 # 3rd party library imports
 from dspace_rest_client.models import Item, Bundle, Bitstream  # noqa : F401
-import psycopg2
 
 # local imports
 from .common import DSpaceCommon
@@ -33,9 +32,6 @@ class ThumbnailGenerator(DSpaceCommon):
 
         self.handle = handle
 
-        self.conn = psycopg2.connect(self.postgres_uri)
-        self.cursor = self.conn.cursor()
-
         self.logger.info('PostgreSQL connection initiated.')
 
     def delete_thumbnail_bitstream(self, item):
@@ -63,27 +59,11 @@ class ThumbnailGenerator(DSpaceCommon):
             msg = f"Deleted bitstream {bitstream.uuid}."
             self.logger.debug(msg)
 
-    def get_database_pagenumber(self):
+    def get_pagenumber(self, item):
         """
         Retrieve the thumbnail pagenumber associated with the current item.
         """
-
-        sql = """
-            select text_value::int
-            from metadatavalue m
-                inner join handle h on h.resource_id = m.dspace_object_id
-            where h.handle = %(handle)s
-            and m.metadata_field_id = 160
-        """
-        self.cursor.execute(sql, {'handle': self.handle})
-        try:
-            page_number = self.cursor.fetchone()[0]
-        except TypeError:
-            msg = "There was no thumbnail page defined for this item."
-            raise RuntimeError(msg)
-
-        msg = f"Retrieve page number {page_number} for the thumbnail"
-        self.logger.debug(msg)
+        page_number = int(item.metadata['mus.data.thumbpage']['value'])
 
         return page_number
 
@@ -187,6 +167,6 @@ class ThumbnailGenerator(DSpaceCommon):
     def run(self):
 
         item = self.get_item_from_handle(self.handle)
-        page_number = self.get_database_pagenumber()
+        page_number = self.get_pagenumber(item)
         self.delete_thumbnail_bitstream(item)
         self.create_new_thumbnail(item, page_number)

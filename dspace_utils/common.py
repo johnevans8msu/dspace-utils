@@ -39,7 +39,6 @@ class DSpaceCommon(object):
         self.username = config['username']
         self.password = config['password']
         self.api_endpoint = config['api_endpoint']
-        self.postgres_uri = config['postgres_uri']
 
         self.client = DSpaceClient(
             api_endpoint=self.api_endpoint,
