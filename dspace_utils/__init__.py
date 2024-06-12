@@ -1,2 +1,5 @@
-from .collections import OwningCollection  # noqa : F401
-from .thumbnails import ThumbnailGenerator  # noqa : F401
+from .collections import OwningCollection
+from .metadata import MetadataDumper
+from .thumbnails import ThumbnailGenerator
+
+__all__ = [OwningCollection, MetadataDumper, ThumbnailGenerator]

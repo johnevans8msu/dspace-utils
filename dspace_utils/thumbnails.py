@@ -1,6 +1,5 @@
 # standard library imports
 import subprocess
-import sys
 import tempfile
 
 # 3rd party library imports

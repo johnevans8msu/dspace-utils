@@ -1,0 +1,46 @@
+name: AVATAR: A CULTURAL AND ETHICAL JOURNEY ACROSS SETTLER-COLONIALISM
+type: item
+handle: 1/18292
+inArchive: true
+uuid: 49022849-8137-4ea0-9caf-bed74d5ea9ca
+withdrawn: false
+metadata:
+    dc.contributor.author:
+        Koh, Celia
+    dc.date.accessioned:
+        2024-01-23T15:39:22Z
+        2024-05-04T15:53:02Z
+    dc.date.available:
+        2024-01-23T15:39:22Z
+        2024-05-04T15:53:02Z
+    dc.date.issued:
+        2023
+    dc.description.provenance:
+        Submitted by Holly Hillis (holly.hillis@montana.edu) on 2024-01-23T15:39:22Z
+        No. of bitstreams: 1
+        koh-avatar-2023.pdf: 977396 bytes, checksum: bad5053ee55f0b430f964025dfcf58e7 (MD5)
+
+        Made available in DSpace on 2024-01-23T15:39:22Z (GMT). No. of bitstreams: 1
+        koh-avatar-2023.pdf: 977396 bytes, checksum: bad5053ee55f0b430f964025dfcf58e7 (MD5)
+          Previous issue date: 2023
+
+        Submitted by John Evans (john.evans8@montana.edu) on 2024-05-04T15:53:02Z
+        No. of bitstreams: 4
+        koh-avatar-2023.pdf: 977396 bytes, checksum: bad5053ee55f0b430f964025dfcf58e7 (MD5)
+        license.txt: 825 bytes, checksum: 58bab10cab320a8d7ccc6b82f3596be0 (MD5)
+        koh-avatar-2023.pdf.txt: 168932 bytes, checksum: bd8bc689d8a25e27051afb73d90d8bce (MD5)
+        koh-avatar-2023.pdf.jpg: 2325 bytes, checksum: 9fc54082fc95c0ce3ae5d455e89fd494 (MD5)
+
+        Made available in DSpace on 2024-05-04T15:53:02Z (GMT). No. of bitstreams: 4
+        koh-avatar-2023.pdf: 977396 bytes, checksum: bad5053ee55f0b430f964025dfcf58e7 (MD5)
+        license.txt: 825 bytes, checksum: 58bab10cab320a8d7ccc6b82f3596be0 (MD5)
+        koh-avatar-2023.pdf.txt: 168932 bytes, checksum: bd8bc689d8a25e27051afb73d90d8bce (MD5)
+        koh-avatar-2023.pdf.jpg: 2325 bytes, checksum: 9fc54082fc95c0ce3ae5d455e89fd494 (MD5)
+          Previous issue date: 2023
+
+    dc.identifier.uri:
+        https://scholarworks.montana.edu/handle/1/18292
+    dc.title:
+        AVATAR: A CULTURAL AND ETHICAL JOURNEY ACROSS SETTLER-COLONIALISM
+    mus.relation.university:
+        Montana State University - Bozeman
