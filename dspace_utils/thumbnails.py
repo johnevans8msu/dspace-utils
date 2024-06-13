@@ -61,7 +61,7 @@ class ThumbnailGenerator(DSpaceCommon):
         """
         Retrieve the thumbnail pagenumber associated with the current item.
         """
-        page_number = int(item.metadata['mus.data.thumbpage']['value'])
+        page_number = int(item.metadata['mus.data.thumbpage'][0]['value'])
 
         return page_number
 
