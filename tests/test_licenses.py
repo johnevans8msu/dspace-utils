@@ -41,12 +41,16 @@ class TestSuite(TestCommon):
         bitstreams[1].name = 'LICENSE'
         mock_client.return_value.get_bitstreams.return_value = bitstreams
 
-        # make up downloaded content for the PDF bitstream
+        # make up downloaded content for the license bitstream
         Response = namedtuple('Response', ['content'])
         r = Response(b'stuff')
         mock_client.return_value.download_bitstream.return_value = r
 
         new_license_file = ir.files('tests.data').joinpath('license.txt')
+
+        # mock newly-created bitstream
+        new_bitstream = mock_bitstream()
+        mock_client.return_value.create_bitstream.return_value = new_bitstream
 
         with (
             patch(

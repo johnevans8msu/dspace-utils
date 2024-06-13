@@ -87,7 +87,7 @@ class LicenseChanger(DSpaceCommon):
             }]
         }
 
-        self.client.create_bitstream(
+        new_bitstream = self.client.create_bitstream(
             bundle=bundle,
             name='license.txt',
             path=self.license_file,
@@ -95,4 +95,5 @@ class LicenseChanger(DSpaceCommon):
             metadata=metadata
         )
 
-        self.logger.debug("Created new license bitstream.")
+        self.logger.info("Created new license bitstream.")
+        self.logger.debug(f"{new_bitstream.as_dict()}")
