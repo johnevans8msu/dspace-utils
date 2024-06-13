@@ -120,7 +120,7 @@ def run_change_license():
         item_handle=args.item_handle, license_file=args.license,
         verbose=args.verbose
     ) as p:
-        print(p)
+        p.run()
 
 
 def run_dump_item_metadata():
