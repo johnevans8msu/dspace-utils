@@ -25,6 +25,8 @@ class DSpaceCommon(object):
 
         self.setup_logging(verbose)
 
+        self.logger.info('Setup nearly complete.')
+
     def __enter__(self):
         return self
 
