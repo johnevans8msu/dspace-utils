@@ -49,13 +49,13 @@ class TestSuite(TestCommon):
 
         # setup the thumbnail page
         mock_item.return_value.metadata = {
-            'mus.data.thumbpage': {
+            'mus.data.thumbpage': [{
                 'authority': None,
                 'confidence': -1,
                 'language': 'en',
                 'place': 1,
                 'value': '10'
-            }
+            }]
         }
 
         mock_subprocess.Popen.return_value.returncode = 0
