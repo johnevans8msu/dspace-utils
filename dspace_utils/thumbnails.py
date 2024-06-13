@@ -32,8 +32,6 @@ class ThumbnailGenerator(DSpaceCommon):
 
         self.handle = handle
 
-        self.logger.info('PostgreSQL connection initiated.')
-
     def delete_thumbnail_bitstream(self, item):
         """
         Delete the thumbnail bitstream associated with the current item.

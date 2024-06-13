@@ -73,3 +73,24 @@ class TestSuite(TestCommon):
             mock.patch.object(sys, 'argv', new=new_argv),
         ):
             commandline.run_dump_item_metadata()
+
+    @mock.patch('dspace_utils.common.DSpaceClient')
+    @mock.patch('dspace_utils.licenses.LicenseChanger.run')
+    def test_change_license_smoke(self, mock_run, mock_dspace_client):
+        """
+        Scenario:  invoke commandline utility for changing the license
+
+        Expected result: no errors
+        """
+
+        mock_run.new = lambda x: None
+
+        new_argv = ['', '1/1234', 'tests/data/new-license.txt']
+        with (
+            mock.patch(
+                'dspace_utils.common.pathlib.Path.read_text',
+                return_value=json.dumps(self.config),
+            ),
+            mock.patch.object(sys, 'argv', new=new_argv),
+        ):
+            commandline.run_change_license()

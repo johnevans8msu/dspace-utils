@@ -14,5 +14,4 @@ class TestCommon(unittest.TestCase):
             'username': 'someuser',
             'password': 'somepass',
             'api_endpoint': 'http://localhost/server/api',
-            'postgres_uri':  'postgres://dspace@localhost/dspace'
         }
