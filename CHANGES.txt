@@ -1,3 +1,7 @@
+Jun 13, 2024 - v0.0.6
+    Add command line utility update-dspace-license.
+    Fix bug retrieving thumbnail page.
+
 Jun 12, 2024 - v0.0.5
     Add command line utility dump-dso for item metadata.
 
