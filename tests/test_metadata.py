@@ -33,13 +33,7 @@ class TestSuite(TestCommon):
 
         mock_item.return_value = item
 
-        with (
-            patch(
-                'dspace_utils.common.pathlib.Path.read_text',
-                return_value=json.dumps(self.config),
-            ),
-            MetadataDumper('1/12345') as o,
-        ):
+        with MetadataDumper('1/12345') as o:
             actual = str(o)
 
         expected = ir.files('tests.data').joinpath('smoke.txt').read_text().rstrip() # noqa : E501

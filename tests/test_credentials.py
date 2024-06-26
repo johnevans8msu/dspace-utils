@@ -1,5 +1,4 @@
 # standard library imports
-import json
 from unittest.mock import patch
 
 # 3rd party library imports
@@ -28,9 +27,9 @@ class TestSuite(TestCommon):
         handle = '1/18274'
 
         self.config.pop('password')
-        s = json.dumps(self.config)
-        with (
-            patch('dspace_utils.common.pathlib.Path.read_text', return_value=s)
+        with patch(
+            'dspace_utils.common.yaml.safe_load',
+            return_value=self.config
         ):
             with self.assertRaises(KeyError):
                 ThumbnailGenerator(handle)
@@ -47,9 +46,8 @@ class TestSuite(TestCommon):
         handle = '1/18274'
 
         self.config.pop('password')
-        s = json.dumps(self.config)
-        with (
-            patch('dspace_utils.common.pathlib.Path.read_text', return_value=s)
+        with patch(
+            'dspace_utils.common.yaml.safe_load', return_value=self.config
         ):
             with self.assertRaises(KeyError):
                 ThumbnailGenerator(handle)
@@ -66,9 +64,8 @@ class TestSuite(TestCommon):
         handle = '1/18274'
 
         self.config.pop('api_endpoint')
-        s = json.dumps(self.config)
-        with (
-            patch('dspace_utils.common.pathlib.Path.read_text', return_value=s)
+        with patch(
+            'dspace_utils.common.yaml.safe_load', return_value=self.config
         ):
             with self.assertRaises(KeyError):
                 ThumbnailGenerator(handle)
@@ -88,8 +85,7 @@ class TestSuite(TestCommon):
             'password': 'somepass',
             'api_endpoint': 'http://localhost/server/api',
         }
-        s = json.dumps(config)
-        with (
-            patch('dspace_utils.common.pathlib.Path.read_text', return_value=s)
+        with patch(
+            'dspace_utils.common.yaml.safe_load', return_value=config
         ):
             ThumbnailGenerator('1/12345')

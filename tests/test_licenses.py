@@ -1,7 +1,6 @@
 # standard library imports
 from collections import namedtuple
 import importlib.resources as ir
-import json
 from unittest.mock import patch
 
 # 3rd party library imports
@@ -52,11 +51,5 @@ class TestSuite(TestCommon):
         new_bitstream = mock_bitstream()
         mock_client.return_value.create_bitstream.return_value = new_bitstream
 
-        with (
-            patch(
-                'dspace_utils.common.pathlib.Path.read_text',
-                return_value=json.dumps(self.config),
-            ),
-            LicenseChanger('1/12345', license_file=new_license_file) as o,
-        ):
+        with LicenseChanger('1/12345', license_file=new_license_file) as o:
             o.run()

@@ -2,7 +2,6 @@
 import unittest
 
 # 3rd party library imports
-# from dspace_rest_client.client import DSpaceClient
 
 # local imports
 
@@ -15,3 +14,11 @@ class TestCommon(unittest.TestCase):
             'password': 'somepass',
             'api_endpoint': 'http://localhost/server/api',
         }
+
+        self.config_mocker = unittest.mock.patch(
+            'dspace_utils.common.yaml.safe_load', return_value=self.config,
+        )
+        self.config_mocker.start()
+
+    def tearDown(self):
+        self.config_mocker.stop()

@@ -1,5 +1,4 @@
 # standard library imports
-import json
 import sys
 from unittest import mock
 
@@ -22,13 +21,7 @@ class TestSuite(TestCommon):
         mock_run.new = lambda x: None
 
         new_argv = ['', '1/1825', '--verbose', 'info']
-        with (
-            mock.patch(
-                'dspace_utils.common.pathlib.Path.read_text',
-                return_value=json.dumps(self.config),
-            ),
-            mock.patch.object(sys, 'argv', new=new_argv),
-        ):
+        with mock.patch.object(sys, 'argv', new=new_argv):
             commandline.run_thumbnail_generator()
 
     @mock.patch('dspace_utils.common.DSpaceClient')
@@ -44,13 +37,7 @@ class TestSuite(TestCommon):
         mock_run.new = lambda x: None
 
         new_argv = ['', '1/1234', '1/2345']
-        with (
-            mock.patch(
-                'dspace_utils.common.pathlib.Path.read_text',
-                return_value=json.dumps(self.config),
-            ),
-            mock.patch.object(sys, 'argv', new=new_argv),
-        ):
+        with mock.patch.object(sys, 'argv', new=new_argv):
             commandline.run_change_owning_collection()
 
     @mock.patch('dspace_utils.common.DSpaceClient')
@@ -65,13 +52,7 @@ class TestSuite(TestCommon):
         mock_run.new = lambda x: None
 
         new_argv = ['', '1/1234']
-        with (
-            mock.patch(
-                'dspace_utils.common.pathlib.Path.read_text',
-                return_value=json.dumps(self.config),
-            ),
-            mock.patch.object(sys, 'argv', new=new_argv),
-        ):
+        with mock.patch.object(sys, 'argv', new=new_argv):
             commandline.run_dump_item_metadata()
 
     @mock.patch('dspace_utils.common.DSpaceClient')
@@ -86,11 +67,5 @@ class TestSuite(TestCommon):
         mock_run.new = lambda x: None
 
         new_argv = ['', '1/1234', 'tests/data/new-license.txt']
-        with (
-            mock.patch(
-                'dspace_utils.common.pathlib.Path.read_text',
-                return_value=json.dumps(self.config),
-            ),
-            mock.patch.object(sys, 'argv', new=new_argv),
-        ):
+        with mock.patch.object(sys, 'argv', new=new_argv):
             commandline.run_change_license()

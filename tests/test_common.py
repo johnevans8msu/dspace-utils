@@ -3,7 +3,6 @@ Test suite that only tests common functionality.
 """
 
 # standard library imports
-import json
 from unittest.mock import patch
 
 # 3rd party library imports
@@ -24,11 +23,5 @@ class TestSuite(TestCommon):
         Expected result:  logging is verified
         """
 
-        with (
-            patch(
-                'dspace_utils.common.pathlib.Path.read_text',
-                return_value=json.dumps(self.config),
-            ),
-        ):
-            with self.assertLogs():
-                ThumbnailGenerator('1/12345', verbose='INFO')
+        with self.assertLogs():
+            ThumbnailGenerator('1/12345', verbose='INFO')

@@ -1,5 +1,4 @@
 # standard library imports
-import json
 from unittest import mock
 
 # 3rd party library imports
@@ -15,9 +14,9 @@ from .common import TestCommon
 @mock.patch('dspace_utils.common.DSpaceClient', autospec=True)
 class TestSuite(TestCommon):
 
-    def test_smoke(self, mock_client, mock_item):
+    def test_owning_collection_smoke(self, mock_client, mock_item):
         """
-        Scenario:  test basic operation
+        Scenario:  test basic operation for changing the owning collection
 
         Expected result:  no errors
         """
@@ -66,19 +65,13 @@ class TestSuite(TestCommon):
 
         mock_client.return_value.api_get.side_effect = [m1, m2, m3, m4]
 
-        with (
-            mock.patch(
-                'dspace_utils.common.pathlib.Path.read_text',
-                return_value=json.dumps(self.config),
-            ),
-        ):
-            with OwningCollection(
-                item_handle=items[0].handle,
-                target_collection_handle=items[1].handle
-            ) as o:
-                o.run()
+        with OwningCollection(
+            item_handle=items[0].handle,
+            target_collection_handle=items[1].handle
+        ) as o:
+            o.run()
 
-                self.assertEqual(o.owning_collection_uuid, items[1].uuid)
+            self.assertEqual(o.owning_collection_uuid, items[1].uuid)
 
     def test_api_put_produces_400(self, mock_client, mock_item):
         """
@@ -136,15 +129,9 @@ class TestSuite(TestCommon):
         m.raise_for_status.side_effect = requests.HTTPError
         mock_client.return_value.session.put.return_value = m
 
-        with (
-            mock.patch(
-                'dspace_utils.common.pathlib.Path.read_text',
-                return_value=json.dumps(self.config),
-            ),
-        ):
-            with OwningCollection(
-                item_handle=items[0].handle,
-                target_collection_handle=items[1].handle
-            ) as o:
-                with self.assertRaises(requests.HTTPError):
-                    o.run()
+        with OwningCollection(
+            item_handle=items[0].handle,
+            target_collection_handle=items[1].handle
+        ) as o:
+            with self.assertRaises(requests.HTTPError):
+                o.run()

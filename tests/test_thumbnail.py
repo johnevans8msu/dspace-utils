@@ -1,6 +1,5 @@
 # standard library imports
 from collections import namedtuple
-import json
 from unittest.mock import patch
 
 # 3rd party library imports
@@ -61,13 +60,7 @@ class TestSuite(TestCommon):
         mock_subprocess.Popen.return_value.returncode = 0
         mock_subprocess.Popen.return_value.communicate.return_value = b'', b''
 
-        with (
-            patch(
-                'dspace_utils.common.pathlib.Path.read_text',
-                return_value=json.dumps(self.config),
-            ),
-            ThumbnailGenerator('1/12345') as o,
-        ):
+        with ThumbnailGenerator('1/12345') as o:
             o.run()
 
     def test_thumbnail_creation_fails(
@@ -106,15 +99,9 @@ class TestSuite(TestCommon):
             b'', b'Something went wrong'
         )
 
-        with (
-            patch(
-                'dspace_utils.common.pathlib.Path.read_text',
-                return_value=json.dumps(self.config),
-            ),
-        ):
-            with self.assertRaises(RuntimeError):
-                with ThumbnailGenerator('1/12345') as o:
-                    o.run()
+        with self.assertRaises(RuntimeError):
+            with ThumbnailGenerator('1/12345') as o:
+                o.run()
 
     def test_no_msu_thumbnail_page(
         self, mock_client, mock_item, mock_bundle, mock_bitstream,
@@ -130,13 +117,7 @@ class TestSuite(TestCommon):
         # There's no thumbnail page defined.
         mock_item.return_value.metadata = {}
 
-        with (
-            patch(
-                'dspace_utils.common.pathlib.Path.read_text',
-                return_value=json.dumps(self.config),
-            ),
-            ThumbnailGenerator('1/12345') as o,
-        ):
+        with ThumbnailGenerator('1/12345') as o:
             with self.assertRaises(KeyError):
                 o.run()
 
@@ -180,11 +161,5 @@ class TestSuite(TestCommon):
         mock_subprocess.Popen.return_value.returncode = 0
         mock_subprocess.Popen.return_value.communicate.return_value = b'', b''
 
-        with (
-            patch(
-                'dspace_utils.common.pathlib.Path.read_text',
-                return_value=json.dumps(self.config),
-            ),
-            ThumbnailGenerator('1/12345') as o,
-        ):
+        with ThumbnailGenerator('1/12345') as o:
             o.run()
