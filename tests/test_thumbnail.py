@@ -1,8 +1,10 @@
 # standard library imports
 from collections import namedtuple
 from unittest.mock import patch
+from unittest import mock
 
 # 3rd party library imports
+import requests
 
 # local imports
 from dspace_utils import ThumbnailGenerator
@@ -40,6 +42,11 @@ class TestSuite(TestCommon):
         bitstreams[1].uuid = '12345678-1234-1234-1234-123456789abd'
         bitstreams[1].name = 'THUMBNAIL'
         mock_client.return_value.get_bitstreams.return_value = bitstreams
+
+        # Mock the api_get call that returns an item
+        api_get_mock = mock.create_autospec(requests.Response)
+        api_get_mock.json.return_value = {'type': 'item'}
+        mock_client.return_value.api_get.return_value = api_get_mock
 
         # make up downloaded content for the PDF bitstream
         Response = namedtuple('Response', ['content'])
@@ -94,6 +101,11 @@ class TestSuite(TestCommon):
         r = Response(b'\xde\xad\xbe\xef')
         mock_client.return_value.download_bitstream.return_value = r
 
+        # Mock the api_get call that returns an item
+        api_get_mock = mock.create_autospec(requests.Response)
+        api_get_mock.json.return_value = {'type': 'item'}
+        mock_client.return_value.api_get.return_value = api_get_mock
+
         mock_subprocess.Popen.return_value.returncode = -1
         mock_subprocess.Popen.return_value.communicate.return_value = (
             b'', b'Something went wrong'
@@ -116,6 +128,11 @@ class TestSuite(TestCommon):
 
         # There's no thumbnail page defined.
         mock_item.return_value.metadata = {}
+
+        # Mock the api_get call that returns an item
+        api_get_mock = mock.create_autospec(requests.Response)
+        api_get_mock.json.return_value = {'type': 'item'}
+        mock_client.return_value.api_get.return_value = api_get_mock
 
         with ThumbnailGenerator('1/12345') as o:
             with self.assertRaises(KeyError):
@@ -152,6 +169,11 @@ class TestSuite(TestCommon):
         mock_client.return_value.get_bitstreams.side_effect = [
             thumbnail_bitstreams, orig_bitstreams
         ]
+
+        # Mock the api_get call that returns an item
+        api_get_mock = mock.create_autospec(requests.Response)
+        api_get_mock.json.return_value = {'type': 'item'}
+        mock_client.return_value.api_get.return_value = api_get_mock
 
         # make up downloaded content for the PDF bitstream (ORIG document)
         Response = namedtuple('Response', ['content'])

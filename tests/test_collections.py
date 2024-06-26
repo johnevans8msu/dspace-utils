@@ -6,7 +6,7 @@ import requests
 
 # local imports
 import dspace_utils
-from dspace_utils import OwningCollection
+from dspace_utils import OwningCollection, CollectionCreator
 from .common import TestCommon
 
 
@@ -14,7 +14,7 @@ from .common import TestCommon
 @mock.patch('dspace_utils.common.DSpaceClient', autospec=True)
 class TestSuite(TestCommon):
 
-    def test_owning_collection_smoke(self, mock_client, mock_item):
+    def test_smoke(self, mock_client, mock_item):
         """
         Scenario:  test basic operation for changing the owning collection
 
@@ -46,16 +46,14 @@ class TestSuite(TestCommon):
 
         # There are 4 calls to the client api_get
         #
-        # The first two return Responses whos values we care not, as we
-        # manufacture Items out of them (see above).  We do care about the
-        # 3rd and 4th calls.
-        #
-        # 1 - don't care, produce an Item from result
-        # 2 - don't care, produce an Item from result
+        # 1 - produces JSON for an Item
+        # 2 - produces JSON for an Item
         # 3 - produces JSON for current owning collection (don't care)
         # 4 - produces JSON for final owning collection
         m1 = mock.create_autospec(requests.Response)
+        m1.json.return_value = {'type': 'item'}
         m2 = mock.create_autospec(requests.Response)
+        m2.json.return_value = {'type': 'item'}
         m3 = mock.create_autospec(requests.Response)
         m3.json.return_value = {
             'handle': 'not-important', 'uuid': 'not-important'
@@ -107,16 +105,15 @@ class TestSuite(TestCommon):
 
         # There are 3 calls to the client api_get
         #
-        # The first two return Responses whos values we care not, as we
-        # manufacture Items out of them (see above).  The 3rd call produces
-        # JSON, but we don't care about it.  We never get to the final 4th call
-        # referenced in the above test.
+        # The first two return Responses that need to be turned into Items.
         #
-        # 1 - don't care, produce an Item from result
-        # 2 - don't care, produce an Item from result
-        # 3 - produces JSON for current owning collection (don't care)
+        # The 3rd call produces JSON, but we don't care about it.
+        # We never get to the final 4th call referenced in the above test.
         m1 = mock.create_autospec(requests.Response)
+        m1.json.return_value = {'type': 'item'}
         m2 = mock.create_autospec(requests.Response)
+        m2.json.return_value = {'type': 'item'}
+
         m3 = mock.create_autospec(requests.Response)
         m3.json.return_value = {
             'handle': 'not-important', 'uuid': 'not-important'
@@ -135,3 +132,105 @@ class TestSuite(TestCommon):
         ) as o:
             with self.assertRaises(requests.HTTPError):
                 o.run()
+
+
+@mock.patch('dspace_utils.common.DSpaceClient', autospec=True)
+class TestSuiteCollections(TestCommon):
+
+    def test_smoke(self, mock_client):
+        """
+        Scenario:  create a collection in some random community
+
+        Expected result:  no errors
+        """
+
+        with CollectionCreator(
+            collection_title='Test Collection',
+            community='98765432-1234-1234-1234-123456789abc'
+        ) as o:
+            with self.assertLogs():
+                o.run()
+
+    def test_smoke_handle(self, mock_client):
+        """
+        Scenario:  create a collection in some random community that is
+        identified by a handle
+
+        Expected result:  no errors
+        """
+
+        # Mock the api_get call that returns an item
+        api_get_mock = mock.create_autospec(requests.Response)
+        api_get_mock.json.return_value = {
+            'type': 'community',
+            'uuid': '98765432-1234-1234-1234-123456789abc',
+        }
+        mock_client.return_value.api_get.return_value = api_get_mock
+
+        with CollectionCreator(
+            collection_title='Test Collection',
+            community='1/2345'
+        ) as o:
+            with self.assertLogs():
+                o.run()
+
+    def test_handle_is_for_an_item(self, mock_client):
+        """
+        Scenario:  pass a handle for the community ID, but it's a handle for
+        an item.
+
+        Expected result:  ValueError
+        """
+
+        # Mock the api_get call that returns an item
+        api_get_mock = mock.create_autospec(requests.Response)
+        api_get_mock.json.return_value = {
+            'type': 'item',
+            'uuid': '98765432-1234-1234-1234-123456789abc',
+        }
+        mock_client.return_value.api_get.return_value = api_get_mock
+
+        with self.assertRaises(ValueError):
+            CollectionCreator(
+                collection_title='Test Collection',
+                community='1/2345'
+            )
+
+    def test_community_id_is_mangled_uuid(self, mock_client):
+        """
+        Scenario:  pass a mangled uuid as the community identifier
+
+        Expected result:  ValueError
+        """
+
+        with self.assertRaises(ValueError):
+            CollectionCreator(
+                collection_title='Test Collection',
+                community='98765432-1234-1234-123456789abc-1234-1243'
+            )
+
+    def test_add_description(self, mock_client):
+        """
+        Scenario: an an optional description
+
+        Expected result:  the description shows up in the logs
+        """
+
+        # Mock the api_get call that returns an item
+        api_get_mock = mock.create_autospec(requests.Response)
+        api_get_mock.json.return_value = {
+            'type': 'community',
+            'uuid': '98765432-1234-1234-1234-123456789abc',
+        }
+        mock_client.return_value.api_get.return_value = api_get_mock
+
+        description = 'something obvious'
+        with CollectionCreator(
+            collection_title='Test Collection',
+            community='1/2345',
+            description=description
+        ) as o:
+            with self.assertLogs() as cl:
+                o.run()
+
+                self.assertIn(description, cl.output[-1])

@@ -5,7 +5,7 @@ import sys
 
 # 3rd party library imports
 from dspace_rest_client.client import DSpaceClient
-from dspace_rest_client.models import Item, Bundle, Bitstream  # noqa : F401
+from dspace_rest_client.models import Collection, Community, Item, Bundle, Bitstream  # noqa : F401
 import yaml
 
 # local imports
@@ -68,7 +68,8 @@ class DSpaceCommon(object):
 
     def get_item_from_handle(self, handle):
         """
-        Locate the item tied to the given handle.
+        Locate the entity tied to the given handle.  This can be a collection,
+        community, or item.
         """
 
         url = f'{self.api_endpoint}/pid/find'
@@ -76,11 +77,23 @@ class DSpaceCommon(object):
         r = self.client.api_get(url, params)
         r.raise_for_status()
 
-        item = Item(r.json())
+        js = r.json()
+
+        match js['type']:
+
+            case 'collection':
+                obj = Collection(js)
+
+            case 'community':
+                obj = Community(js)
+
+            case 'item':
+                obj = Item(js)
 
         msg = (
-            f"Constructed item with UUID {item.uuid} from handle {handle}"
+            f"Constructed {js['type']} with UUID {obj.uuid} "
+            f"from handle {handle}"
         )
         self.logger.debug(msg)
 
-        return item
+        return obj

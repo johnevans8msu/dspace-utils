@@ -2,11 +2,112 @@
 Manage DSpace collections
 """
 # standard library imports
+import re
+import sys
+import uuid
 
 # 3rd party library imports
 
 # local imports
 from .common import DSpaceCommon
+
+
+class CollectionCreator(DSpaceCommon):
+    """
+    Create a new collection.
+
+    Attributes
+    ----------
+    title : str
+        Title/name of the new collection.
+    community : str
+        ID of the parent community.
+    """
+
+    def __init__(
+        self, *, collection_title=None, community=None, description=None,
+        verbose='info'
+    ):
+        super().__init__(verbose)
+        self.collection_title = collection_title
+        self.description = description
+
+        # is it a handle?  if so, we need to get the UUID of the community.
+        if re.match(r'\d/\d{1,5}', community) is not None:
+            # Ok, we have a handle, turn it into a collection
+            collection = self.get_item_from_handle(community)
+
+            if collection.type != 'community':
+                msg = (
+                    f'The ID {community} was for a {collection.type}, not a '
+                    'community.'
+                )
+                raise ValueError(msg)
+
+            community = collection.uuid
+
+        # Is it a UUID?
+        try:
+            uuid.UUID(f'{{{community}}}')
+        except ValueError:
+            # ok, not a UUID
+            _, value, traceback = sys.exc_info()
+            msg = f'The community ID was not a handle or UUID:  "{value}"'
+            raise ValueError(msg).with_traceback(traceback)
+
+        self.community = community
+
+    def run(self):
+        # put together the metadata
+        metadata = {
+            'type': {
+                'value': 'community'
+            },
+            'metadata': {
+                'dc.title': [
+                    {
+                        'language': None,
+                        'value': self.collection_title,
+                    },
+                ],
+                'dc.description': [
+                    {
+                        'language': None,
+                        'value': self.description
+                    },
+                ],
+                'dc.description.abstract': [
+                    {
+                        'language': None,
+                    },
+                ],
+                'dc.rights': [
+                    {
+                        'language': None,
+                    },
+                ],
+                'dc.rights.license': [
+                    {
+                        'language': None,
+                    },
+                ],
+                'dc.description.tableofcontents': [
+                    {
+                        'language': None,
+                    },
+                ],
+            }
+        }
+
+        new_collection = self.client.create_collection(
+            parent=self.community, data=metadata
+        )
+
+        msg = (
+            f'New collection {new_collection.uuid} create at '
+            f'{new_collection.handle} with description "{self.description}".'
+        )
+        self.logger.info(msg)
 
 
 class OwningCollection(DSpaceCommon):

@@ -1,9 +1,10 @@
 # standard library imports
 from collections import namedtuple
 import importlib.resources as ir
-from unittest.mock import patch
+from unittest import mock
 
 # 3rd party library imports
+import requests
 
 # local imports
 from dspace_utils import LicenseChanger
@@ -11,10 +12,10 @@ from dspace_utils.thumbnails import Bundle
 from .common import TestCommon
 
 
-@patch('dspace_utils.licenses.Bitstream', autospec=True)
-@patch('dspace_utils.licenses.Bundle', autospec=True)
-@patch('dspace_utils.common.Item', autospec=True)
-@patch('dspace_utils.common.DSpaceClient', autospec=True)
+@mock.patch('dspace_utils.licenses.Bitstream', autospec=True)
+@mock.patch('dspace_utils.licenses.Bundle', autospec=True)
+@mock.patch('dspace_utils.common.Item', autospec=True)
+@mock.patch('dspace_utils.common.DSpaceClient', autospec=True)
 class TestSuite(TestCommon):
 
     def test_smoke(
@@ -39,6 +40,11 @@ class TestSuite(TestCommon):
         bitstreams[1].uuid = '12345678-1234-1234-1234-123456789abd'
         bitstreams[1].name = 'LICENSE'
         mock_client.return_value.get_bitstreams.return_value = bitstreams
+
+        # Mock the api_get call that returns an item
+        api_get_mock = mock.create_autospec(requests.Response)
+        api_get_mock.json.return_value = {'type': 'item'}
+        mock_client.return_value.api_get.return_value = api_get_mock
 
         # make up downloaded content for the license bitstream
         Response = namedtuple('Response', ['content'])
