@@ -1,6 +1,6 @@
-Jun 13, 2024 - v0.0.6
-    Add command line utility update-dspace-license.
-    Fix bug retrieving thumbnail page.
+Jun 28, 2024 - v0.0.7
+    Add command line utility for creating a collection.
+    Add ability to dump metadata for a collection.
 
 Jun 12, 2024 - v0.0.5
     Add command line utility dump-dso for item metadata.
