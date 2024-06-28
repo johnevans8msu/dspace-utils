@@ -1,0 +1,16 @@
+name: Community 1
+type: community
+handle: 1/12345
+uuid: 49022849-8137-4ea0-9caf-bed74d5ea9ca
+metadata:
+    dc.description:
+        Wormhole from Brisbane to Knoxville
+    dc.description.abstract:
+        stuff went here
+    dc.identifier.uri:
+        https://lib1.lib.montana.edu/handle/1/18263
+    dc.title:
+        Tennessee
+Collections:
+    "a" : 2/2354 : 12345678-1234-5678-12345678901234567
+    "b" : 3/4567 : 22345678-1234-5678-12345678901234567

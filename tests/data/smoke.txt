@@ -1,9 +1,9 @@
 name: AVATAR: A CULTURAL AND ETHICAL JOURNEY ACROSS SETTLER-COLONIALISM
 type: item
 handle: 1/18292
-inArchive: true
 uuid: 49022849-8137-4ea0-9caf-bed74d5ea9ca
 withdrawn: false
+inArchive: true
 metadata:
     dc.contributor.author:
         Koh, Celia
