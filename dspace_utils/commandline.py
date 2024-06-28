@@ -140,14 +140,16 @@ def run_change_license():
 
 def run_dump_item_metadata():
 
-    description = "Change the owning collection of an article/item."
+    description = (
+        "Display metadata for a dspace object (item/collection/community)."
+    )
     parser = argparse.ArgumentParser(
         description=description,
         epilog=_EPILOG,
         formatter_class=argparse.RawDescriptionHelpFormatter
     )
 
-    parser.add_argument('item_handle', help="Handle for existing item.")
+    parser.add_argument('handle', help="Handle for dspace object.")
 
     parser.add_argument(
         '--verbose', help='Logging level',
@@ -158,6 +160,6 @@ def run_dump_item_metadata():
     args = parser.parse_args()
 
     with MetadataDumper(
-        item_handle=args.item_handle, verbose=args.verbose
+        handle=args.handle, verbose=args.verbose
     ) as p:
         print(p)

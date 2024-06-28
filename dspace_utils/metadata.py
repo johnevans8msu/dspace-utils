@@ -8,10 +8,10 @@ class MetadataDumper(DSpaceCommon):
     """
     Print item metadata
     """
-    def __init__(self, item_handle, verbose='info'):
+    def __init__(self, handle, verbose='info'):
         super().__init__(verbose)
 
-        self.item = self.get_item_from_handle(item_handle)
+        self.item = self.get_item_from_handle(handle)
 
     def __str__(self):
         lines = []
