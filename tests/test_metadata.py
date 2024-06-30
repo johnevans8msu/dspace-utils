@@ -93,3 +93,54 @@ class TestSuite(TestCommon):
 
         expected = ir.files('tests.data').joinpath('community.txt').read_text().rstrip() # noqa : E501
         self.assertEqual(actual, expected)
+
+    @mock.patch('dspace_utils.common.Item', autospec=True)
+    @mock.patch('dspace_utils.common.Collection', autospec=True)
+    @mock.patch('dspace_utils.common.DSpaceClient', autospec=True)
+    def test_collection(self, mock_client, mock_collection, mock_item):
+        """
+        Scenario:  test basic operation for dumping a collection
+        """
+
+        # Mock the api_get call that returns an item
+        api_get_mock = mock.create_autospec(requests.Response)
+        api_get_mock.json.return_value = {'type': 'collection'}
+        mock_client.return_value.api_get.return_value = api_get_mock
+
+        # mock the collection object
+        collection = dspace_utils.common.Collection()
+
+        collection.name = 'Collection 1'
+        collection.type = 'collection'
+        collection.handle = '1/12345'
+        collection.uuid = '49022849-8137-4ea0-9caf-bed74d5ea9ca'
+
+        text = ir.files('tests.data').joinpath('collection.json').read_text()
+        collection.metadata = json.loads(text)
+
+        mock_collection.return_value = collection
+
+        # mock the items contained in this collection
+        items = []
+
+        item = dspace_utils.common.Item()
+        item.name = 'a'
+        item.type = 'item'
+        item.uuid = '12345678-1234-5678-12345678901234567'
+        item.handle = '2/2354'
+        items.append(item)
+
+        item = dspace_utils.common.Item()
+        item.name = 'b'
+        item.type = 'item'
+        item.uuid = '22345678-1234-5678-12345678901234567'
+        item.handle = '3/4567'
+        items.append(item)
+
+        mock_client.return_value.search_objects.return_value = items
+
+        with MetadataDumper('1/12345') as o:
+            actual = str(o)
+
+        expected = ir.files('tests.data').joinpath('collection.txt').read_text().rstrip() # noqa : E501
+        self.assertEqual(actual, expected)
