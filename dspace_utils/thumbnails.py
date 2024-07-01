@@ -27,8 +27,8 @@ class ThumbnailGenerator(DSpaceCommon):
         REST interface wrapper
     """
 
-    def __init__(self, handle, verbose='info'):
-        super().__init__(verbose)
+    def __init__(self, handle, verbose='info', client=None):
+        super().__init__(verbose=verbose, client=client)
 
         self.handle = handle
 

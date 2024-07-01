@@ -4,7 +4,7 @@ import argparse
 # local imports
 from dspace_utils import (
     LicenseChanger, OwningCollection, ThumbnailGenerator, MetadataDumper,
-    CollectionCreator
+    CollectionCreator, LiveMigrator
 )
 
 _LOGGING_VERBOSITY_CHOICES = ["critical", "error", "warning", "info", "debug"]
@@ -21,6 +21,39 @@ _EPILOG = (
     "    |     api: DSpace API endpoint,\n"
     "    |          e.g. https://localhost/server/api\n\n"
 )
+
+
+def run_live_migration():
+    """
+    Command line entry point for running migrations to the LIVE collection.
+    """
+
+    description = "Migrate all items in collection to the LIVE collection."
+    parser = argparse.ArgumentParser(
+        description=description,
+        epilog=_EPILOG,
+        formatter_class=argparse.RawDescriptionHelpFormatter
+    )
+
+    help = "Handle for source in-process collection."
+    parser.add_argument('source', help=help)
+
+    help = "Handle for target collection."
+    default = '1/733'
+    parser.add_argument('--target', default=default, help=help)
+
+    parser.add_argument(
+        '--verbose', help='Logging level',
+        choices=_LOGGING_VERBOSITY_CHOICES,
+        default='info'
+    )
+
+    args = parser.parse_args()
+
+    with LiveMigrator(
+        args.source, target=args.target, verbose=args.verbose
+    ) as p:
+        p.run()
 
 
 def run_thumbnail_generator():
@@ -92,8 +125,8 @@ def run_change_owning_collection():
         formatter_class=argparse.RawDescriptionHelpFormatter
     )
 
-    parser.add_argument('item_handle', help="Handle for existing item.")
-    parser.add_argument('new', help="Handle for new owning collection.")
+    parser.add_argument('item', help="Handle for existing item.")
+    parser.add_argument('collection', help="Handle for new owning collection.")
 
     parser.add_argument(
         '--verbose', help='Logging level',
@@ -104,8 +137,8 @@ def run_change_owning_collection():
     args = parser.parse_args()
 
     with OwningCollection(
-        item_handle=args.item_handle,
-        target_collection_handle=args.new,
+        item_handle=args.item,
+        target_collection_handle=args.collection,
         verbose=args.verbose
     ) as p:
         p.run()

@@ -1,0 +1,37 @@
+{
+    "dc.date.accessioned": [{
+        "authority": null,
+        "confidence": -1,
+        "language": null,
+        "place": 0,
+        "value": "2024-02-15T01:01:01Z"
+    }],
+    "dc.date.available": [{
+        "authority": null,
+        "confidence": -1,
+        "language": null,
+        "place": 0,
+        "value": "2024-02-15T01:01:01Z"
+    }],
+    "dc.description": [{
+        "authority": null,
+        "confidence": -1,
+        "language": null,
+        "place": 0,
+        "value": "Wormhole from Brisbane to Knoxville"
+    }],
+ "dc.description.abstract": [{"authority": null,
+                              "confidence": -1,
+                              "language": null,
+                              "place": 0,
+                              "value": "stuff went here"}],
+ "dc.identifier.uri": [{"authority": null,
+                        "confidence": -1,
+                        "language": null,
+                        "place": 0,
+                        "value": "https://lib1.lib.montana.edu/handle/1/18263"}],
+ "dc.title": [{"authority": null,
+               "confidence": -1,
+               "language": null,
+               "place": 0,
+               "value": "Tennessee"}]}

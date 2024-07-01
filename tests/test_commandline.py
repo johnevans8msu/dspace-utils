@@ -13,6 +13,20 @@ from .common import TestCommon
 @mock.patch('dspace_utils.common.DSpaceClient')
 class TestSuite(TestCommon):
 
+    @mock.patch('dspace_utils.migration.LiveMigrator.run')
+    def test_migrate_to_live_smoke(self, mock_run, mock_dspace_client):
+        """
+        Scenario:  invoke commandline utility
+
+        Expected result:  no errors
+        """
+
+        mock_run.new = lambda x: None
+
+        new_argv = ['', '1/1825', '--verbose', 'info']
+        with mock.patch.object(sys, 'argv', new=new_argv):
+            commandline.run_live_migration()
+
     @mock.patch('dspace_utils.thumbnails.ThumbnailGenerator.run')
     def test_thumbnail_smoke(self, mock_run, mock_dspace_client):
         """

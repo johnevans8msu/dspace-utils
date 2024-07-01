@@ -19,9 +19,9 @@ class DSpaceCommon(object):
         3rd party wrapper for REST methods
     """
 
-    def __init__(self, verbose):
+    def __init__(self, verbose=None, client=None):
 
-        self.setup_credentials()
+        self.setup_credentials(client)
 
         self.setup_logging(verbose)
 
@@ -33,7 +33,19 @@ class DSpaceCommon(object):
     def __exit__(self, exc_type, exc_value, exc_traceback):
         pass
 
-    def setup_credentials(self):
+    def setup_credentials(self, client):
+        """
+        Authorize ourselves to take administrative action with dspace.
+
+        Parameters
+        ----------
+        client : dspace_rest_client.DSpaceClient
+            If this parameter is passed, then we are already authorized.
+        """
+
+        if client is not None:
+            self.client = client
+            return
 
         p = pathlib.Path.home() / '.config/dspace-utils/dspace.yml'
         config = yaml.safe_load(p.read_text())
@@ -72,7 +84,7 @@ class DSpaceCommon(object):
         community, or item.
         """
 
-        url = f'{self.api_endpoint}/pid/find'
+        url = f'{self.client.API_ENDPOINT}/pid/find'
         params = {'id': f'hdl:{handle}'}
         r = self.client.api_get(url, params)
         r.raise_for_status()

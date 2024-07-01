@@ -126,9 +126,9 @@ class OwningCollection(DSpaceCommon):
 
     def __init__(
         self, *, item_handle=None, target_collection_handle=None,
-        verbose='info'
+        client=None, verbose='info'
     ):
-        super().__init__(verbose)
+        super().__init__(verbose=verbose, client=client)
 
         self.item = self.get_item_from_handle(item_handle)
         self.target_collection_item = self.get_item_from_handle(target_collection_handle)  # noqa : E501
@@ -147,7 +147,7 @@ class OwningCollection(DSpaceCommon):
         Set member UUID (actually a str) of owning collection.
         """
 
-        url = f'{self.api_endpoint}/core/items/{self.item.uuid}/owningCollection'  # noqa : E501
+        url = f'{self.client.API_ENDPOINT}/core/items/{self.item.uuid}/owningCollection'  # noqa : E501
         r = self.client.api_get(url)
         r.raise_for_status()
 
