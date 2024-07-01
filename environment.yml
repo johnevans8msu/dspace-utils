@@ -2,6 +2,7 @@ name: dspace
 channels:
   - conda-forge
 dependencies:
+  - graphicsmagick
   - ipython
   - matplotlib
   - numpy
