@@ -35,7 +35,7 @@ class CollectionCreator(DSpaceCommon):
         # is it a handle?  if so, we need to get the UUID of the community.
         if re.match(r'\d/\d{1,5}', community) is not None:
             # Ok, we have a handle, turn it into a collection
-            collection = self.get_item_from_handle(community)
+            collection = self.get_obj_from_handle(community)
 
             if collection.type != 'community':
                 msg = (
@@ -135,8 +135,8 @@ class OwningCollection(DSpaceCommon):
 
     def run(self):
 
-        self.item = self.get_item_from_handle(self.item_handle)
-        self.target_collection_item = self.get_item_from_handle(self.target_collection_handle)  # noqa : E501
+        self.item = self.get_obj_from_handle(self.item_handle)
+        self.target_collection_item = self.get_obj_from_handle(self.target_collection_handle)  # noqa : E501
 
         self.get_owning_collection_uuid()
         self.reset_collection()

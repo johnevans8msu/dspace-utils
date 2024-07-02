@@ -81,7 +81,7 @@ class DSpaceCommon(object):
         h.setFormatter(formatter)
         self.logger.addHandler(h)
 
-    def get_item_from_handle(self, handle):
+    def get_obj_from_handle(self, handle):
         """
         Locate the entity tied to the given handle.  This can be a collection,
         community, or item.

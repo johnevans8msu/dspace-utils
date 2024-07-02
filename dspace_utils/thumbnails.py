@@ -164,7 +164,7 @@ class ThumbnailGenerator(DSpaceCommon):
 
     def run(self):
 
-        item = self.get_item_from_handle(self.handle)
+        item = self.get_obj_from_handle(self.handle)
         page_number = self.get_pagenumber(item)
         self.delete_thumbnail_bitstream(item)
         self.create_new_thumbnail(item, page_number)

@@ -23,7 +23,7 @@ class LiveMigrator(DSpaceCommon):
 
     def run(self):
 
-        self.source_collection = self.get_item_from_handle(self.source)
+        self.source_collection = self.get_obj_from_handle(self.source)
 
         for obj in self.client.search_objects(
             query='*:*', scope=self.source_collection.uuid, dso_type='item'

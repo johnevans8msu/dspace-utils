@@ -11,7 +11,7 @@ class MetadataDumper(DSpaceCommon):
     def __init__(self, handle, verbose='info'):
         super().__init__(verbose)
 
-        self.item = self.get_item_from_handle(handle)
+        self.item = self.get_obj_from_handle(handle)
 
     def __str__(self):
         lines = []

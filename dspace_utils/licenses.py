@@ -51,7 +51,7 @@ class LicenseChanger(DSpaceCommon):
 
     def run(self):
 
-        item = self.get_item_from_handle(self.handle)
+        item = self.get_obj_from_handle(self.handle)
         self.delete_license_bitstream(item)
         self.create_new_license_bitstream(item)
 
