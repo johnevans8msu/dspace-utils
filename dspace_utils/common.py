@@ -90,6 +90,13 @@ class DSpaceCommon(object):
         url = f'{self.api_endpoint}/pid/find'
         params = {'id': f'hdl:{handle}'}
 
+        # Sometimes a Content-Encoding header sticks around after a previous
+        # client operation.  Never send this in a GET.
+        try:
+            self.client.session.headers.pop('Content-Encoding')
+        except KeyError:
+            pass
+
         r = self.client.api_get(url, params)
         r.raise_for_status()
 
