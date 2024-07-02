@@ -43,16 +43,19 @@ class DSpaceCommon(object):
             If this parameter is passed, then we are already authorized.
         """
 
-        if client is not None:
-            self.client = client
-            return
-
+        # There MUST be a configuration file...
         p = pathlib.Path.home() / '.config/dspace-utils/dspace.yml'
         config = yaml.safe_load(p.read_text())
 
         self.username = config['username']
         self.password = config['password']
         self.api_endpoint = config['api_endpoint']
+
+        # ... but if we were passed a client, we don't need to use those
+        # credentials to authenticate again
+        if client is not None:
+            self.client = client
+            return
 
         self.client = DSpaceClient(
             api_endpoint=self.api_endpoint,
@@ -84,8 +87,9 @@ class DSpaceCommon(object):
         community, or item.
         """
 
-        url = f'{self.client.API_ENDPOINT}/pid/find'
+        url = f'{self.api_endpoint}/pid/find'
         params = {'id': f'hdl:{handle}'}
+
         r = self.client.api_get(url, params)
         r.raise_for_status()
 

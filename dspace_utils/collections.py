@@ -130,12 +130,15 @@ class OwningCollection(DSpaceCommon):
     ):
         super().__init__(verbose=verbose, client=client)
 
-        self.item = self.get_item_from_handle(item_handle)
-        self.target_collection_item = self.get_item_from_handle(target_collection_handle)  # noqa : E501
-
-        self.get_owning_collection_uuid()
+        self.item_handle = item_handle
+        self.target_collection_handle = target_collection_handle
 
     def run(self):
+
+        self.item = self.get_item_from_handle(self.item_handle)
+        self.target_collection_item = self.get_item_from_handle(self.target_collection_handle)  # noqa : E501
+
+        self.get_owning_collection_uuid()
 
         self.reset_collection()
 
@@ -147,7 +150,7 @@ class OwningCollection(DSpaceCommon):
         Set member UUID (actually a str) of owning collection.
         """
 
-        url = f'{self.client.API_ENDPOINT}/core/items/{self.item.uuid}/owningCollection'  # noqa : E501
+        url = f'{self.api_endpoint}/core/items/{self.item.uuid}/owningCollection'  # noqa : E501
         r = self.client.api_get(url)
         r.raise_for_status()
 
