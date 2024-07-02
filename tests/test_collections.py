@@ -44,12 +44,11 @@ class TestSuite(TestCommon):
         items = [item1, item2]
         mock_item.side_effect = items
 
-        # There are 4 calls to the client api_get
+        # There are 3 calls to the client api_get
         #
         # 1 - produces JSON for an Item
         # 2 - produces JSON for an Item
         # 3 - produces JSON for current owning collection (don't care)
-        # 4 - produces JSON for final owning collection
         m1 = mock.create_autospec(requests.Response)
         m1.json.return_value = {'type': 'item'}
         m2 = mock.create_autospec(requests.Response)
@@ -58,18 +57,14 @@ class TestSuite(TestCommon):
         m3.json.return_value = {
             'handle': 'not-important', 'uuid': 'not-important'
         }
-        m4 = mock.create_autospec(requests.Response)
-        m4.json.return_value = {'handle': item2.handle, 'uuid': item2.uuid}
 
-        mock_client.return_value.api_get.side_effect = [m1, m2, m3, m4]
+        mock_client.return_value.api_get.side_effect = [m1, m2, m3]
 
         with OwningCollection(
             item_handle=items[0].handle,
             target_collection_handle=items[1].handle
         ) as o:
             o.run()
-
-            self.assertEqual(o.owning_collection_uuid, items[1].uuid)
 
     def test_api_put_produces_400(self, mock_client, mock_item):
         """

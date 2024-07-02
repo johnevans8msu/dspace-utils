@@ -139,11 +139,7 @@ class OwningCollection(DSpaceCommon):
         self.target_collection_item = self.get_item_from_handle(self.target_collection_handle)  # noqa : E501
 
         self.get_owning_collection_uuid()
-
         self.reset_collection()
-
-        # This is verification that we got it right.
-        self.get_owning_collection_uuid()
 
     def get_owning_collection_uuid(self):
         """
