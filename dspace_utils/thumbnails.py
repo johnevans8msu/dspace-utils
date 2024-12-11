@@ -106,6 +106,8 @@ class ThumbnailGenerator(DSpaceCommon):
             filter(lambda x: x.name == 'THUMBNAIL', bundles),
             None
         )
+        if thumbnail_bundle is None:
+            thumbnail_bundle = self.client.create_bundle(parent=item, name='THUMBNAIL')
 
         # get the original document
         orig_bundle = next(
