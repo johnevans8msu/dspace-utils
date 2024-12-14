@@ -63,6 +63,8 @@ class ThumbnailGenerator(DSpaceCommon):
         """
         page_number = int(item.metadata['mus.data.thumbpage'][0]['value'])
 
+        self.logger.info(f'Retrieved page number {page_number}.')
+
         return page_number
 
     def create_thumbnail_image(
@@ -83,6 +85,7 @@ class ThumbnailGenerator(DSpaceCommon):
             f'gm convert -thumbnail 160x160 '
             f'-flatten {orig_doc_path}[{page_number}] {new_thumbnail_path}'
         )
+        self.logger.info(f'Running command "{cmd}"...')
         p = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE)
         p.wait()
 

@@ -21,11 +21,8 @@ class DSpaceCommon(object):
 
     def __init__(self, verbose=None, client=None):
 
-        self.setup_credentials(client)
-
         self.setup_logging(verbose)
-
-        self.logger.info('Setup nearly complete.')
+        self.setup_credentials(client)
 
     def __enter__(self):
         return self
@@ -50,6 +47,8 @@ class DSpaceCommon(object):
         self.username = config['username']
         self.password = config['password']
         self.api_endpoint = config['api_endpoint']
+
+        self.logger.info(f'Using {self.api_endpoint} for the API endpoint')
 
         # ... but if we were passed a client, we don't need to use those
         # credentials to authenticate again
