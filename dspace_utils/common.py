@@ -15,14 +15,26 @@ class DSpaceCommon(object):
     """
     Attributes
     ----------
+    api_endpoint : str
+        This should be something like
+        https://scholarworks.montana.edu/server/api.  In most cases, it should
+        be set in the config file.
     client : DSpaceClient
         3rd party wrapper for REST methods
     """
 
-    def __init__(self, verbose=None, client=None):
+    def __init__(self, verbose=None, client=None, endpoint=None):
 
         self.setup_logging(verbose)
+
+        self.parse_config()
+        if endpoint is not None:
+            # This overrides the value set through the config file.
+            self.api_endpoint = endpoint
+
         self.setup_credentials(client)
+
+        self.logger.info(f'Using {self.api_endpoint} for the API endpoint')
 
     def __enter__(self):
         return self
@@ -30,14 +42,9 @@ class DSpaceCommon(object):
     def __exit__(self, exc_type, exc_value, exc_traceback):
         pass
 
-    def setup_credentials(self, client):
+    def parse_config(self):
         """
-        Authorize ourselves to take administrative action with dspace.
-
-        Parameters
-        ----------
-        client : dspace_rest_client.DSpaceClient
-            If this parameter is passed, then we are already authorized.
+        Parse the config file.  It had better exist.
         """
 
         # There MUST be a configuration file...
@@ -48,7 +55,15 @@ class DSpaceCommon(object):
         self.password = config['password']
         self.api_endpoint = config['api_endpoint']
 
-        self.logger.info(f'Using {self.api_endpoint} for the API endpoint')
+    def setup_credentials(self, client):
+        """
+        Authorize ourselves to take administrative action with dspace.
+
+        Parameters
+        ----------
+        client : dspace_rest_client.DSpaceClient
+            If this parameter is passed, then we are already authorized.
+        """
 
         # ... but if we were passed a client, we don't need to use those
         # credentials to authenticate again

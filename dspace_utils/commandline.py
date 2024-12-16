@@ -11,9 +11,9 @@ _LOGGING_VERBOSITY_CHOICES = ["critical", "error", "warning", "info", "debug"]
 
 _EPILOG = (
     "Rather than use command line arguments for passing credentials, it is \n"
-    "required to make use of a configuration file.  This YAML file should \n"
-    "be located at $HOME/.config/dspace-utils/dspace.yml.  The format of \n"
-    "the file should be as follows:\n\n"
+    "recommended to make use of a configuration file.  This YAML file \n"
+    "should be located at $HOME/.config/dspace-utils/dspace.yml.  The \n"
+    "format of the file should be as follows:\n\n"
     "    +----------------------------------------------------------\n"
     "    | config:\n"
     "    |     username: the-username\n"
@@ -73,9 +73,14 @@ def run_thumbnail_generator():
         default='info'
     )
 
+    help = 'Set the API endpoint.  This overrides the config file value'
+    parser.add_argument('--endpoint', help=help, default='info')
+
     args = parser.parse_args()
 
-    with ThumbnailGenerator(args.handle, verbose=args.verbose) as p:
+    with ThumbnailGenerator(
+        args.handle, verbose=args.verbose, endpoint=args.endpoint
+    ) as p:
         p.run()
 
 
